@@ -15,7 +15,7 @@ public class TargetPlatformModelReaderTest {
   @Test
   public void testRead() throws Exception {
     TargetPlatformModel model;
-    try (InputStream is = new FileInputStream("src/main/resources/target-platform.xml")) {
+    try (InputStream is = new FileInputStream("src/test/resources/target-platform.xml")) {
       model = new TargetPlatformModelXpp3Reader().read(is);
     }
 
