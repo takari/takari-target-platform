@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<target-platform>
+  <artifacts>
+    <artifact v="1" g="g" a="a">
+      <checksums>
+        <sha1 type="pom">1</sha1>
+        <sha1 type="jar">2</sha1>
+        <sha1 classifier="sources" type="jar">2</sha1>
+      </checksums>
+    </artifact>
+  </artifacts>
+</target-platform>

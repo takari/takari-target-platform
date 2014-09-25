@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+
+<model xmlns="http://modello.codehaus.org/MODELLO/1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.1 http://modello.codehaus.org/xsd/modello-1.4.1.xsd">
+
+  <id>takari-target-platform</id>
+  <name>TargetPlatformModel</name>
+
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>io.takari.maven.targetplatform.model</value>
+    </default>
+  </defaults>
+
+  <classes>
+    <class rootElement="true" xml.tagName="target-platform">
+      <name>TargetPlatformModel</name>
+      <fields>
+        <field>
+          <name>artifacts</name>
+          <association>
+            <type>TargetPlatformArtifact</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>TargetPlatformArtifact</name>
+      <fields>
+        <field xml.attribute="true" xml.tagName="g">
+          <name>groupId</name>
+          <version>1.0.0</version>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true" xml.tagName="a">
+          <name>artifactId</name>
+          <version>1.0.0</version>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true" xml.tagName="v">
+          <name>version</name>
+          <version>1.0.0</version>
+          <type>String</type>
+        </field>
+        <field>
+          <name>checksums</name>
+          <association xml.tagName="sha1">
+            <type>TargetPlatformArtifactSHA1</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <class xml.tagName="sha1">
+      <name>TargetPlatformArtifactSHA1</name>
+      <fields>
+        <field xml.attribute="true">
+          <name>type</name>
+          <version>1.0.0</version>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>classifier</name>
+          <version>1.0.0</version>
+          <type>String</type>
+        </field>
+        <field xml.content="true">
+          <name>value</name>
+          <version>1.0.0</version>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+
+  </classes>
+</model>
