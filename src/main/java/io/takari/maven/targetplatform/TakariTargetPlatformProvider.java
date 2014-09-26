@@ -27,13 +27,14 @@ public class TakariTargetPlatformProvider implements TargetPlatformProvider {
   public TakariTargetPlatformProvider(MavenSession session) throws IOException,
       XmlPullParserException {
     File file = new File(session.getRequest().getBaseDirectory(), "target-platform.xml");
-    TargetPlatformModel model = null;
+    TakariTargetPlatform targetPlatform = null;
     if (file.isFile() && file.canRead()) {
       try (InputStream is = new FileInputStream(file)) {
-        model = new TargetPlatformModelXpp3Reader().read(is);
+        TargetPlatformModel model = new TargetPlatformModelXpp3Reader().read(is);
+        targetPlatform = new TakariTargetPlatform(model, session.getAllProjects());
       }
     }
-    this.targetPlatform = new TakariTargetPlatform(model);
+    this.targetPlatform = targetPlatform;
   }
 
   @Override

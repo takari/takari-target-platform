@@ -19,7 +19,7 @@
       <fields>
         <field>
           <name>artifacts</name>
-          <association>
+          <association xml.itemsStyle="flat">
             <type>TargetPlatformArtifact</type>
             <multiplicity>*</multiplicity>
           </association>
@@ -45,36 +45,22 @@
           <version>1.0.0</version>
           <type>String</type>
         </field>
-        <field>
-          <name>checksums</name>
-          <association xml.tagName="sha1">
-            <type>TargetPlatformArtifactSHA1</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-      </fields>
-    </class>
-
-    <class xml.tagName="sha1">
-      <name>TargetPlatformArtifactSHA1</name>
-      <fields>
-        <field xml.attribute="true">
-          <name>type</name>
+        <field xml.attribute="true" xml.tagName="e">
+          <name>extension</name>
           <version>1.0.0</version>
           <type>String</type>
         </field>
-        <field xml.attribute="true">
+        <field xml.attribute="true" xml.tagName="c">
           <name>classifier</name>
           <version>1.0.0</version>
           <type>String</type>
         </field>
-        <field xml.content="true">
-          <name>value</name>
+        <field xml.attribute="true" xml.tagName="sha1">
+          <name>SHA1</name>
           <version>1.0.0</version>
           <type>String</type>
         </field>
       </fields>
     </class>
-
   </classes>
 </model>
