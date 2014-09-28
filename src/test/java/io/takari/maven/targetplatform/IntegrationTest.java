@@ -59,4 +59,12 @@ public class IntegrationTest {
     maven.forProject(basedir).execute("clean", "compile").assertErrorFreeLog();
   }
 
+
+  @Test
+  public void testSystemScope() throws Exception {
+    File basedir = resources.getBasedir("systemscope");
+
+    maven.forProject(basedir).execute("clean", "compile").assertErrorFreeLog();
+  }
+
 }

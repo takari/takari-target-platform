@@ -1,0 +1,39 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>systemscope</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <description>
+  The point of this test is to document handling of scope=system dependencies.
+  
+  Since target platform defines external artifacts and system dependencies are
+  by definition local, they are always allowed.
+  
+  Another way to think about it, system dependency is a file with arbitrary
+  name. Currently, target platform is defined in terms of artifact coordinates
+  and cannot define control access to local filesystem contents.
+
+  There are already mechanisms to disallow scope=system dependencies during the
+  build, so adding this capability to target platform seems redundant.
+  </description>
+
+  <properties>
+    <!--
+      | Location of tools.jar in Sun/Oracle JDK. 
+      | This test will fail on Apple and I assume IBM JDK
+     -->
+    <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.sun</groupId>
+      <artifactId>tools</artifactId>
+      <version>1</version>
+      <scope>system</scope>
+      <systemPath>${toolsjar}</systemPath>
+    </dependency>
+  </dependencies>
+</project>
