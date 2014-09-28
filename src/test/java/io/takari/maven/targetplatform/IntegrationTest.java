@@ -51,4 +51,12 @@ public class IntegrationTest {
 
     maven.forProject(basedir).execute("clean", "compile").assertErrorFreeLog();
   }
+
+  @Test
+  public void testDependencyManagement() throws Exception {
+    File basedir = resources.getBasedir("dependencymanagement");
+
+    maven.forProject(basedir).execute("clean", "compile").assertErrorFreeLog();
+  }
+
 }

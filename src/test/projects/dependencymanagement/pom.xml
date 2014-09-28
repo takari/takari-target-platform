@@ -1,0 +1,35 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>dependencymanagement</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <description>
+  The point of this test is to validate that target platform filtering is 
+  enforced after dependency management. 
+
+  junit 4.11 depends on hamcrest-core 1.3, which is NOT part of the target platform
+  managed hamcrest-core 1.2.1 is part of the target platform
+
+  Dependency resolution is expected to succeed and include hamcrest-core 1.2.1
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<target-platform>
+  <artifact g="junit" a="junit" v="4.11"/>
+  <artifact g="org.hamcrest" a="hamcrest-core" v="1.2.1"/>
+</target-platform>
