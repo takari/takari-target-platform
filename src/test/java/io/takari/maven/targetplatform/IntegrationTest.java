@@ -42,7 +42,7 @@ public class IntegrationTest {
 
     result.assertLogText("[ERROR]");
     result.assertLogText("project build target platform");
-    result.assertLogText("[junit:junit:jar:4.11]");
+    result.assertLogText("junit:junit:jar:4.11");
   }
 
   @Test
