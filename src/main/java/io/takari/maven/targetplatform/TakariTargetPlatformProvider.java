@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,6 +40,9 @@ public class TakariTargetPlatformProvider implements TargetPlatformProvider {
 
   @Override
   public TakariTargetPlatform getTargetPlatform(MavenProject project) {
+    if (Arrays.asList("maven-plugin", "takari-maven-plugin").contains(project.getPackaging())) {
+      return null;
+    }
     return targetPlatform;
   }
 
