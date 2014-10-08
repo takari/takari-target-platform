@@ -34,21 +34,25 @@
           <name>groupId</name>
           <version>1.0.0</version>
           <type>String</type>
+          <required>true</required>
         </field>
         <field xml.attribute="true" xml.tagName="a">
           <name>artifactId</name>
           <version>1.0.0</version>
           <type>String</type>
+          <required>true</required>
         </field>
         <field xml.attribute="true" xml.tagName="v">
           <name>version</name>
           <version>1.0.0</version>
           <type>String</type>
+          <required>true</required>
         </field>
         <field xml.attribute="true" xml.tagName="e">
           <name>extension</name>
           <version>1.0.0</version>
           <type>String</type>
+          <required>true</required>
         </field>
         <field xml.attribute="true" xml.tagName="c">
           <name>classifier</name>
@@ -59,6 +63,7 @@
           <name>SHA1</name>
           <version>1.0.0</version>
           <type>String</type>
+          <required>true</required>
         </field>
       </fields>
     </class>

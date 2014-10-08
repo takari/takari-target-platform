@@ -2,19 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>basic</artifactId>
+  <artifactId>transitiveversionrange-module-a</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-
-  <properties>
-    <junit.version>3.8.1</junit.version>
-  </properties>
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
+      <groupId>io.takari.maven.targetplatform.tests</groupId>
+      <artifactId>transitiveversionrange-module-b</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -36,4 +31,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

@@ -4,7 +4,7 @@ target platform work, roughly in priority order
 
 ## Investigate enforcement of sha1 checksums
 
-The main goal here is to validate Maven and Aether APIs and provde this is
+The main goal here is to validate Maven and Aether APIs and prove this is
 possible. The original idea of this feature was two-fold. In the short term it
 was meant to provide safeguards against artifacts with different contents but
 same coordinates, which results in hard to troubleshoot build failures. Longer

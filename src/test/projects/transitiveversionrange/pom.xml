@@ -1,0 +1,13 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>transitiveversionrange</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>module-a</module>
+    <module>module-b</module>
+  </modules>
+</project>

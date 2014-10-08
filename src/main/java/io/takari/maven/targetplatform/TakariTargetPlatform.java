@@ -6,7 +6,6 @@ import io.takari.maven.targetplatform.model.TargetPlatformModel;
 import java.util.Collection;
 
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.TargetPlatform;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
@@ -18,7 +17,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
-public class TakariTargetPlatform implements TargetPlatform {
+public class TakariTargetPlatform {
 
   private static final VersionScheme versionScheme = new GenericVersionScheme();
 
@@ -52,7 +51,6 @@ public class TakariTargetPlatform implements TargetPlatform {
     this.artifacts = Multimaps.unmodifiableMultimap(artifacts);
   }
 
-  @Override
   public boolean includes(Artifact artifact) {
     Collection<Version> versions = getVersions(artifact);
 
@@ -92,7 +90,6 @@ public class TakariTargetPlatform implements TargetPlatform {
     return false;
   }
 
-  @Override
   public boolean includes(Artifact artifact, Version version) {
     Collection<Version> versions = getVersions(artifact);
 

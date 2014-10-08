@@ -15,12 +15,11 @@ import javax.inject.Named;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.TargetPlatformProvider;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @Named
 @SessionScoped
-public class TakariTargetPlatformProvider implements TargetPlatformProvider {
+public class TakariTargetPlatformProvider {
 
   private final TakariTargetPlatform targetPlatform;
 
@@ -38,7 +37,6 @@ public class TakariTargetPlatformProvider implements TargetPlatformProvider {
     this.targetPlatform = targetPlatform;
   }
 
-  @Override
   public TakariTargetPlatform getTargetPlatform(MavenProject project) {
     if (Arrays.asList("maven-plugin", "takari-maven-plugin").contains(project.getPackaging())) {
       return null;

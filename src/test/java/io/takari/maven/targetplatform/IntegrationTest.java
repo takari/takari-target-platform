@@ -28,9 +28,23 @@ public class IntegrationTest {
   public void testBasic() throws Exception {
     File basedir = resources.getBasedir("basic");
 
-    maven.forProject(basedir) //
-        .withCliOption("-Djunit.version=3.8.1").execute("clean", "compile") //
-        .assertErrorFreeLog();
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .withCliOption("-Dmaven.repo.local=" + new File("target/localrepo").getCanonicalPath()) //
+        .withCliOption("-Djunit.version=3.8.1").execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:3.8.1:test");
+  }
+
+  @Test
+  public void testBasic_versionRange() throws Exception {
+    File basedir = resources.getBasedir("basic");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .withCliOption("-Djunit.version=[3,4)").execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:3.8.1:test");
   }
 
   @Test
@@ -65,6 +79,20 @@ public class IntegrationTest {
     File basedir = resources.getBasedir("systemscope");
 
     maven.forProject(basedir).execute("clean", "compile").assertErrorFreeLog();
+  }
+
+  @Test
+  public void testTransitiveVersionRange() throws Exception {
+    File basedir = resources.getBasedir("transitiveversionrange");
+
+//    maven.forProject(new File(basedir, "module-b")).execute("clean", "install") //
+//        .assertErrorFreeLog();
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .withCliOptions("--projects", "module-a").execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:3.8.1:compile");
   }
 
 }
