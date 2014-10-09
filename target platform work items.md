@@ -2,20 +2,6 @@ target platform work, roughly in priority order
 
 # Must have "target platform v1.0" work items
 
-## Investigate enforcement of sha1 checksums
-
-The main goal here is to validate Maven and Aether APIs and prove this is
-possible. The original idea of this feature was two-fold. In the short term it
-was meant to provide safeguards against artifacts with different contents but
-same coordinates, which results in hard to troubleshoot build failures. Longer
-term it can be used as extra level of validation of artifacts used by the 
-build, for security reasons mostly.
-
-Need to decide if checksum validation failures should be retried with other
-repositories or not. Not clean if Aether supports this, at least for pom.xml
-files.
-
-
 # Investigate usage of target platform as implicit dependencyManagement
 
 Currently, the same dependency artifact is referenced in three places
@@ -67,6 +53,12 @@ by the build itself, i.e. similar to how Maven separates <dependencies> and
 
 The above requirements suggest XML or another structured text file format.
 
+# Cache artifact SHA1
+
+SHA1 is expensive to calculate, don't do this again and again for the same file
+
+Cache can be keys by (file, length, timestamp) 3-tuple
+
 # Prepare and release required Maven core changes
 
 I assume that most of the initial investigation and implementation will happen
@@ -78,6 +70,23 @@ support "hooks" and "Takari Target Platform" implementation.
 For each target platform entry list its direct dependencies, which versions 
 of these dependencies are requested and which are provided by the target
 platform.
+
+~~~~~~~~~~~~~~~~
+
+# Done
+
+## Investigate enforcement of sha1 checksums (2014-10-09)
+
+The main goal here is to validate Maven and Aether APIs and prove this is
+possible. The original idea of this feature was two-fold. In the short term it
+was meant to provide safeguards against artifacts with different contents but
+same coordinates, which results in hard to troubleshoot build failures. Longer
+term it can be used as extra level of validation of artifacts used by the 
+build, for security reasons mostly.
+
+Need to decide if checksum validation failures should be retried with other
+repositories or not. Not clean if Aether supports this, at least for pom.xml
+files.
 
 
 ~~~~~~~~~~~~~~~~

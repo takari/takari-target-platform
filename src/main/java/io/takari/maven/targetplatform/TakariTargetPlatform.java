@@ -3,7 +3,10 @@ package io.takari.maven.targetplatform;
 import io.takari.maven.targetplatform.model.TargetPlatformArtifact;
 import io.takari.maven.targetplatform.model.TargetPlatformModel;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.artifact.Artifact;
@@ -21,28 +24,44 @@ public class TakariTargetPlatform {
 
   private static final VersionScheme versionScheme = new GenericVersionScheme();
 
-  // g:a:c:e => { v }
-  private final Multimap<String, Version> artifacts;
+  private static class ArtifactInfo {
+    public final String classifier;
+    public final String extension;
+    public final Version version;
+    public final String sha1;
+
+    public ArtifactInfo(String classifier, String extension, Version version, String sha1) {
+      this.classifier = classifier;
+      this.extension = extension;
+      this.version = version;
+      this.sha1 = sha1;
+    }
+  }
+
+  // g:a:c:e => { info }
+  private final Multimap<String, ArtifactInfo> artifacts;
 
   public TakariTargetPlatform(TargetPlatformModel model, Collection<MavenProject> projects) {
-    final Multimap<String, Version> artifacts = HashMultimap.create();
+    final Multimap<String, ArtifactInfo> artifacts = HashMultimap.create();
 
     for (TargetPlatformArtifact artifact : model.getArtifacts()) {
       try {
         String key = versionlessKey(artifact);
         Version version = versionScheme.parseVersion(artifact.getVersion());
-        artifacts.put(key, version);
+        String classifier = artifact.getClassifier() != null ? artifact.getClassifier() : "";
+        artifacts.put(key,
+            new ArtifactInfo(classifier, artifact.getExtension(), version, artifact.getSHA1()));
       } catch (InvalidVersionSpecificationException e) {
         // ignore, can't happen
       }
     }
 
-    // TODO this logic really belongs to DefaultProjectDependenciesResolver
+    // TODO this logic really belongs to TargetPlatformSessionDecorator
     for (MavenProject project : projects) {
       try {
         String key = key(project.getGroupId(), project.getArtifactId(), "*", "*");
         Version version = versionScheme.parseVersion(project.getVersion());
-        artifacts.put(key, version);
+        artifacts.put(key, new ArtifactInfo("*", "*", version, null));
       } catch (InvalidVersionSpecificationException e) {
         // ignore, can't happen
       }
@@ -73,11 +92,18 @@ public class TakariTargetPlatform {
   }
 
   private Collection<Version> getVersions(Artifact artifact) {
-    Collection<Version> versions = artifacts.get(keyGACE(artifact));
+    Collection<ArtifactInfo> infos = artifacts.get(keyGACE(artifact));
 
-    if (versions.isEmpty()) {
-      versions = artifacts.get(keyGA(artifact));
+    // hack to support project-project dependencies, remove
+    if (infos.isEmpty()) {
+      infos = artifacts.get(keyGA(artifact));
     }
+
+    Set<Version> versions = new HashSet<>();
+    for (ArtifactInfo info : infos) {
+      versions.add(info.version);
+    }
+
     return versions;
   }
 
@@ -126,4 +152,24 @@ public class TakariTargetPlatform {
         extension != null ? extension : "jar");
   }
 
+  public String getSHA1(Artifact artifact) throws IOException {
+    for (ArtifactInfo info : artifacts.get(keyGACE(artifact))) {
+      if (eq(info.classifier, artifact.getClassifier())
+          && eq(info.extension, artifact.getExtension())) {
+        try {
+          Version version = versionScheme.parseVersion(artifact.getVersion());
+          if (version.equals(info.version)) {
+            return info.sha1;
+          }
+        } catch (InvalidVersionSpecificationException e) {
+          // can't happen as of aether 1.0
+        }
+      }
+    }
+    return null;
+  }
+
+  private static <T> boolean eq(T a, T b) {
+    return a != null ? a.equals(b) : b == null;
+  }
 }

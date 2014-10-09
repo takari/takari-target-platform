@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <target-platform>
-  <artifact g="junit" a="junit" v="3.8.1"/>
+  <artifact g="junit" a="junit" e="pom" v="3.8.1" sha1="16d74791c801c89b0071b1680ea0bc85c93417bb"/>
+  <artifact g="junit" a="junit" e="jar" v="3.8.1" sha1="99129f16442844f6a4a11ae22fbbee40b14d774f"/>
 </target-platform>

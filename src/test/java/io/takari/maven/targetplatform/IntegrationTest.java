@@ -82,17 +82,17 @@ public class IntegrationTest {
   }
 
   @Test
-  public void testTransitiveVersionRange() throws Exception {
-    File basedir = resources.getBasedir("transitiveversionrange");
+  public void testChecksumPom() throws Exception {
+    File basedir = resources.getBasedir("checksum-pom");
 
-//    maven.forProject(new File(basedir, "module-b")).execute("clean", "install") //
-//        .assertErrorFreeLog();
+    maven.forProject(basedir).execute("clean", "compile").assertLogText("invalid-pom-checksum");;
+  }
 
-    MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOptions("--projects", "module-a").execute("clean", "compile");
+  @Test
+  public void testChecksumJar() throws Exception {
+    File basedir = resources.getBasedir("checksum-jar");
 
-    result.assertErrorFreeLog();
-    result.assertLogText("junit:junit:jar:3.8.1:compile");
+    maven.forProject(basedir).execute("clean", "compile").assertLogText("invalid-jar-checksum");;
   }
 
 }
