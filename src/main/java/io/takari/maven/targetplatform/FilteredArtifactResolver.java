@@ -14,10 +14,13 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.internal.impl.DefaultArtifactResolver;
+import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +43,17 @@ public class FilteredArtifactResolver implements ArtifactResolver {
   public ArtifactResult resolveArtifact(RepositorySystemSession session, ArtifactRequest request)
       throws ArtifactResolutionException {
     ArtifactResult result = resolver.resolveArtifact(session, request);
-    validate(session, Collections.singletonList(result));
+    List<ArtifactResult> results = Collections.singletonList(result);
+    List<ArtifactResult> blocked = validate(session, results);
+    if (!blocked.isEmpty()) {
+      Artifact artifact = blocked.get(0).getArtifact();
+      ArtifactRepository repository = blocked.get(0).getRepository();
+      RemoteRepository remoteRepository =
+          (RemoteRepository) (repository instanceof RemoteRepository ? repository : null);
+      String message = "Artifact is not part of the project build target platform " + artifact;
+      ArtifactNotFoundException anfe = new ArtifactNotFoundException(artifact, remoteRepository);
+      throw new ArtifactResolutionException(results, message, anfe);
+    }
     return result;
   }
 
@@ -48,17 +61,29 @@ public class FilteredArtifactResolver implements ArtifactResolver {
   public List<ArtifactResult> resolveArtifacts(RepositorySystemSession session,
       Collection<? extends ArtifactRequest> requests) throws ArtifactResolutionException {
     List<ArtifactResult> results = resolver.resolveArtifacts(session, requests);
-    validate(session, results);
+    List<ArtifactResult> blocked = validate(session, results);
+    if (!blocked.isEmpty()) {
+      StringBuilder message = new StringBuilder();
+      message.append("Artifacts are not part of the project build target platform: [");
+      for (int i = 0; i < blocked.size(); i++) {
+        if (i > 0) {
+          message.append(", ");
+        }
+        message.append(blocked.get(i).getArtifact());
+      }
+      message.append("]");
+      throw new ArtifactResolutionException(results, message.toString());
+    }
     return results;
   }
 
-  private void validate(RepositorySystemSession session, List<ArtifactResult> results)
-      throws ArtifactResolutionException {
+  private List<ArtifactResult> validate(RepositorySystemSession session,
+      List<ArtifactResult> results) throws ArtifactResolutionException {
     TakariTargetPlatform targetPlatform =
         (TakariTargetPlatform) session.getData().get(TakariTargetPlatform.class);
 
     if (targetPlatform != null) {
-      List<Artifact> blocked = new ArrayList<Artifact>();
+      List<ArtifactResult> blocked = new ArrayList<>();
       for (ArtifactResult result : results) {
         Artifact artifact = result.getArtifact();
 
@@ -76,28 +101,26 @@ public class FilteredArtifactResolver implements ArtifactResolver {
         // have to use generic exception message and logging
 
         if (!targetPlatform.includes(artifact)) {
-          log.error("Artifact is not part of the project build target platform {}", artifact);
-          blocked.add(artifact);
+          log.info("Artifact is not part of the project build target platform {}", artifact);
+          blocked.add(result);
         } else {
           try {
             String actualSha1 = Files.hash(artifact.getFile(), Hashing.sha1()).toString();
             String expectedSha1 = targetPlatform.getSHA1(artifact);
             if (!actualSha1.equals(expectedSha1)) {
-              log.error("Artifact {} has invalid SHA1 checksum, expected {}, actual {}", artifact,
+              log.info("Artifact {} has invalid SHA1 checksum, expected {}, actual {}", artifact,
                   expectedSha1, actualSha1);
-              blocked.add(artifact);
+              blocked.add(result);
             }
           } catch (IOException e) {
-            log.error("Could not calculate artifact SHA1 checksum {}", artifact, e);
-            blocked.add(artifact);
+            log.info("Could not calculate artifact SHA1 checksum {}", artifact, e);
+            blocked.add(result);
           }
         }
       }
-      if (!blocked.isEmpty()) {
-        throw new ArtifactResolutionException(results,
-            "Artifacts are not part of the project build target platform " + blocked);
-      }
+      return blocked;
     }
+    return Collections.emptyList();
   }
 
   @Named

@@ -29,7 +29,6 @@ public class IntegrationTest {
     File basedir = resources.getBasedir("basic");
 
     MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOption("-Dmaven.repo.local=" + new File("target/localrepo").getCanonicalPath()) //
         .withCliOption("-Djunit.version=3.8.1").execute("clean", "compile");
 
     result.assertErrorFreeLog();
@@ -95,4 +94,13 @@ public class IntegrationTest {
     maven.forProject(basedir).execute("clean", "compile").assertLogText("invalid-jar-checksum");;
   }
 
+  @Test
+  public void testPomless() throws Exception {
+    File basedir = resources.getBasedir("pomless");
+
+    MavenExecutionResult result = maven.forProject(basedir).withCliOption("-e").execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:3.8.1:compile");
+  }
 }
