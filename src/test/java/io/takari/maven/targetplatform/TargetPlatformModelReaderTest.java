@@ -1,6 +1,7 @@
 package io.takari.maven.targetplatform;
 
 import io.takari.maven.targetplatform.model.TargetPlatformArtifact;
+import io.takari.maven.targetplatform.model.TargetPlatformGAV;
 import io.takari.maven.targetplatform.model.TargetPlatformModel;
 import io.takari.maven.targetplatform.model.io.xpp3.TargetPlatformModelXpp3Reader;
 import io.takari.maven.targetplatform.model.io.xpp3.TargetPlatformModelXpp3Writer;
@@ -20,8 +21,17 @@ public class TargetPlatformModelReaderTest {
 
     TargetPlatformModel model = new TargetPlatformModel();
 
+    TargetPlatformGAV gav = new TargetPlatformGAV();
+    model.addGav(gav);
+    gav.setGroupId("g");
+    gav.setArtifactId("a");
+    gav.setVersion("v");
+
     TargetPlatformArtifact artifact = new TargetPlatformArtifact();
-    model.addArtifact(artifact);
+    gav.addArtifact(artifact);
+    artifact.setClassifier("c");
+    artifact.setExtension("e");
+    artifact.setSHA1("xxx");
 
     StringWriter writer = new StringWriter();
     new TargetPlatformModelXpp3Writer().write(writer, model);
@@ -36,11 +46,13 @@ public class TargetPlatformModelReaderTest {
       model = new TargetPlatformModelXpp3Reader().read(is);
     }
 
-    Assert.assertEquals(3, model.getArtifacts().size());
+    Assert.assertEquals(1, model.getGavs().size());
 
-    TargetPlatformArtifact artifact = model.getArtifacts().get(0);
-    Assert.assertEquals("g", artifact.getGroupId());
-    Assert.assertEquals("a", artifact.getArtifactId());
-    Assert.assertEquals("1", artifact.getVersion());
+    TargetPlatformGAV gav = model.getGavs().get(0);
+    Assert.assertEquals("g", gav.getGroupId());
+    Assert.assertEquals("a", gav.getArtifactId());
+    Assert.assertEquals("1", gav.getVersion());
+
+    Assert.assertEquals(3, gav.getArtifacts().size());
   }
 }

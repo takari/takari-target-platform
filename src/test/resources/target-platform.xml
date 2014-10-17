@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <target-platform>
-  <artifact v="1" g="g" a="a" e="pom" sha1="1"/>
-  <artifact v="1" g="g" a="a" e="jar" sha1="2"/>
-  <artifact v="1" g="g" a="a" c="sources" e="jar" sha1="3"/>
+  <gav v="1" g="g" a="a">
+    <artifact e="pom" sha1="1" />
+    <artifact e="jar" sha1="2" />
+    <artifact c="sources" e="jar" sha1="3" />
+  </gav>
 </target-platform>

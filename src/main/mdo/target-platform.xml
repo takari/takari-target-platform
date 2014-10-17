@@ -18,9 +18,9 @@
       <name>TargetPlatformModel</name>
       <fields>
         <field>
-          <name>artifacts</name>
+          <name>gavs</name>
           <association xml.itemsStyle="flat">
-            <type>TargetPlatformArtifact</type>
+            <type>TargetPlatformGAV</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -28,7 +28,7 @@
     </class>
 
     <class>
-      <name>TargetPlatformArtifact</name>
+      <name>TargetPlatformGAV</name>
       <fields>
         <field xml.attribute="true" xml.tagName="g">
           <name>groupId</name>
@@ -48,6 +48,36 @@
           <type>String</type>
           <required>true</required>
         </field>
+        <field xml.attribute="true" xml.tagName="e">
+          <name>extension</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field xml.attribute="true" xml.tagName="c">
+          <name>classifier</name>
+          <version>1.0.0</version>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true" xml.tagName="sha1">
+          <name>SHA1</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>artifacts</name>
+          <association xml.itemsStyle="flat">
+            <type>TargetPlatformArtifact</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>TargetPlatformArtifact</name>
+      <fields>
         <field xml.attribute="true" xml.tagName="e">
           <name>extension</name>
           <version>1.0.0</version>

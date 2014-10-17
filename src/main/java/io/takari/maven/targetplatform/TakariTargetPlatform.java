@@ -1,6 +1,7 @@
 package io.takari.maven.targetplatform;
 
 import io.takari.maven.targetplatform.model.TargetPlatformArtifact;
+import io.takari.maven.targetplatform.model.TargetPlatformGAV;
 import io.takari.maven.targetplatform.model.TargetPlatformModel;
 
 import java.io.IOException;
@@ -44,13 +45,15 @@ public class TakariTargetPlatform {
   public TakariTargetPlatform(TargetPlatformModel model, Collection<MavenProject> projects) {
     final Multimap<String, ArtifactInfo> artifacts = HashMultimap.create();
 
-    for (TargetPlatformArtifact artifact : model.getArtifacts()) {
+    for (TargetPlatformGAV gav : model.getGavs()) {
       try {
-        String key = versionlessKey(artifact);
-        Version version = versionScheme.parseVersion(artifact.getVersion());
-        String classifier = artifact.getClassifier() != null ? artifact.getClassifier() : "";
-        artifacts.put(key,
-            new ArtifactInfo(classifier, artifact.getExtension(), version, artifact.getSHA1()));
+        Version version = versionScheme.parseVersion(gav.getVersion());
+        for (TargetPlatformArtifact artifact : gav.getArtifacts()) {
+          String key = versionlessKey(gav, artifact);
+          String classifier = artifact.getClassifier() != null ? artifact.getClassifier() : "";
+          artifacts.put(key, new ArtifactInfo(classifier, artifact.getExtension(), version,
+              artifact.getSHA1()));
+        }
       } catch (InvalidVersionSpecificationException e) {
         // ignore, can't happen
       }
@@ -146,9 +149,9 @@ public class TakariTargetPlatform {
     return key(artifact.getGroupId(), artifact.getArtifactId(), "*", "*");
   }
 
-  private static String versionlessKey(TargetPlatformArtifact artifact) {
+  private static String versionlessKey(TargetPlatformGAV gav, TargetPlatformArtifact artifact) {
     String extension = artifact.getExtension();
-    return key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(),
+    return key(gav.getGroupId(), gav.getArtifactId(), artifact.getClassifier(),
         extension != null ? extension : "jar");
   }
 
