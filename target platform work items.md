@@ -1,8 +1,8 @@
-target platform work, roughly in priority order
+# target platform work, roughly in priority order
 
 # Must have "target platform v1.0" work items
 
-# Investigate usage of target platform as implicit dependencyManagement
+## Investigate usage of target platform as implicit dependencyManagement
 
 Currently, the same dependency artifact is referenced in three places
 
@@ -71,7 +71,7 @@ For each target platform entry list its direct dependencies, which versions
 of these dependencies are requested and which are provided by the target
 platform.
 
-~~~~~~~~~~~~~~~~
+========
 
 # Done
 
@@ -89,7 +89,7 @@ repositories or not. Not clean if Aether supports this, at least for pom.xml
 files.
 
 
-~~~~~~~~~~~~~~~~
+=======
 
 # Nice to have items
 
