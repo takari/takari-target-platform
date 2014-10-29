@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -21,27 +21,35 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @SessionScoped
 public class TakariTargetPlatformProvider {
 
+  public static final String PROP_DISABLE = "takari.targetplatform.disable";
+
   private final TakariTargetPlatform targetPlatform;
 
   @Inject
   public TakariTargetPlatformProvider(MavenSession session) throws IOException,
       XmlPullParserException {
-    File file = new File(session.getRequest().getBaseDirectory(), "target-platform.xml");
     TakariTargetPlatform targetPlatform = null;
-    if (file.isFile() && file.canRead()) {
-      try (InputStream is = new FileInputStream(file)) {
-        TargetPlatformModel model = new TargetPlatformModelXpp3Reader().read(is);
-        targetPlatform = new TakariTargetPlatform(model, session.getAllProjects());
+    if (!isDisabled(session.getSystemProperties()) && !isDisabled(session.getUserProperties())) {
+      File file = new File(session.getRequest().getBaseDirectory(), "target-platform.xml");
+      if (file.isFile() && file.canRead()) {
+        try (InputStream is = new FileInputStream(file)) {
+          TargetPlatformModel model = new TargetPlatformModelXpp3Reader().read(is);
+          targetPlatform = new TakariTargetPlatform(model, session.getAllProjects());
+        }
       }
     }
     this.targetPlatform = targetPlatform;
   }
 
   public TakariTargetPlatform getTargetPlatform(MavenProject project) {
-    if (Arrays.asList("maven-plugin", "takari-maven-plugin").contains(project.getPackaging())) {
+    if (isDisabled(project.getProperties())) {
       return null;
     }
     return targetPlatform;
+  }
+
+  private static boolean isDisabled(Properties properties) {
+    return Boolean.parseBoolean(properties.getProperty(PROP_DISABLE));
   }
 
 }

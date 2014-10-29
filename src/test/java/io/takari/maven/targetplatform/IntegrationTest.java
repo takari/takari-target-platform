@@ -59,6 +59,30 @@ public class IntegrationTest {
   }
 
   @Test
+  public void testBasic_userProperty_targetPlatformDisable() throws Exception {
+    File basedir = resources.getBasedir("basic");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .withCliOption("-Djunit.version=4.11") //
+        .withCliOption("-Dtakari.targetplatform.disable=true") //
+        .execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:4.11:test");
+  }
+
+  @Test
+  public void testDisabled() throws Exception {
+    File basedir = resources.getBasedir("disabled");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:4.11:test");
+  }
+
+  @Test
   public void testMultimodule() throws Exception {
     File basedir = resources.getBasedir("multimodule");
 
@@ -98,7 +122,9 @@ public class IntegrationTest {
   public void testPomless() throws Exception {
     File basedir = resources.getBasedir("pomless");
 
-    MavenExecutionResult result = maven.forProject(basedir).withCliOption("-e").execute("clean", "compile");
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .withCliOption("-e") //
+        .execute("clean", "compile");
 
     result.assertErrorFreeLog();
     result.assertLogText("junit:junit:jar:3.8.1:compile");

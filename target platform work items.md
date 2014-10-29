@@ -11,7 +11,7 @@ Currently, the same dependency artifact is referenced in three places
   dependencyManagement section
 * as target platform element
 
-This is not very user-friedly and unnecessary complicates depenency management
+This is not very user-friendly and unnecessary complicates depenency management
 Need to find a way to eliminate core/pom.xml dependencyManagement.
 
 The current plan is to remove all/most of <excludes/> elements and to rely on
@@ -26,20 +26,6 @@ some of which are forks of opensource projects. "Resources", just files, which
 I am guessing are used by ant build or at runtime. The tool will be used
 to reconstruct current ext directory structure from target platform 
 configuration and ext-resources stored in p4.
-
-
-# Target platform configuration for maven-plugin projects
-
-Short-term, need to find a convenient way to disable target platform filtering
-for maven-plugin projects. I assume we will use target platform configuration
-to materialize ext directory and I also assume ext directory should not include
-maven plugin dependencies. If these assumptions are not correct, the same 
-target platform configuration can be used for all projects.
-
-Long-term, we will may need separate target platform to define artifacts used
-by the build itself, i.e. similar to how Maven separates <dependencies> and
-<pluginDependencies>. This is not require for "target platform v1.0"
-
 
 # Target platform configuration file format
 
@@ -88,6 +74,13 @@ Need to decide if checksum validation failures should be retried with other
 repositories or not. Not clean if Aether supports this, at least for pom.xml
 files.
 
+# Target platform configuration for maven-plugin projects (2014-10-29)
+
+Short-term, need to find a convenient way to disable target platform filtering
+for maven-plugin projects. I assume we will use target platform configuration
+to materialize ext directory and I also assume ext directory should not include
+maven plugin dependencies. If these assumptions are not correct, the same 
+target platform configuration can be used for all projects.
 
 =======
 
@@ -123,3 +116,10 @@ than to prove why we don't need to fix it.
 Maven checks for missing pom.xml files during each build. May not be worth
 fixing because we want to enforce presence of pom.xml files. Like with
 metadata.xml files, severity depends on network configuration.
+
+# Target platform configuration for maven-plugin projects
+
+Long-term, we will may need separate target platform to define artifacts used
+by the build itself, i.e. similar to how Maven separates <dependencies> and
+<pluginDependencies>. This is not require for "target platform v1.0"
+
