@@ -10,6 +10,9 @@
     <apache-maven.version>3.2.4-SNAPSHOT</apache-maven.version>
     <takari-lifecycle.version>1.8.3</takari-lifecycle.version>
     <guava.version>14.0.1</guava.version>
+
+    <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+    <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
   </properties>
 
   <dependencies>
@@ -109,6 +112,76 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.5.3</version>
+        <executions>
+          <execution>
+            <id>manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+            <!--
+              | This is not generic OSGi bundle manifest configuration!
+              | The generated bundle is a fragment of m2e maven runtime
+              | and therefore can only be used as part of m2e extension. 
+             -->
+            <configuration>
+              <instructions>
+                <_failok>true</_failok>
+                <_nouses>true</_nouses>
+                <_nodefaultversion>true</_nodefaultversion>
+                <_snapshot>${osgi-version-qualifier}</_snapshot>
+
+                <Bundle-SymbolicName>io.takari.targetplatform;singleton:=false</Bundle-SymbolicName>
+                <Bundle-RequiredExecutionEnvironment>JavaSE-1.7,JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
+                <Fragment-Host>org.eclipse.m2e.maven.runtime</Fragment-Host>
+
+                <Export-Package>io.takari.maven.targetplatform.*</Export-Package>
+                <Import-Package>!*</Import-Package>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
+
+        <configuration>
+          <supportedProjectTypes>
+            <type>takari-jar</type>
+          </supportedProjectTypes>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <properties>
+        <osgi-version-qualifier>qualifier</osgi-version-qualifier>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>maven-bundle-plugin</artifactId>
+              <configuration>
+                <!-- PDE does not honour custom manifest location -->
+                <manifestLocation>META-INF</manifestLocation>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
