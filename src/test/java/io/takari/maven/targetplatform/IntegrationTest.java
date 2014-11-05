@@ -83,6 +83,17 @@ public class IntegrationTest {
   }
 
   @Test
+  public void testDisabledParent() throws Exception {
+    File basedir = resources.getBasedir("disabled-parent");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:4.11:test");
+  }
+
+  @Test
   public void testMultimodule() throws Exception {
     File basedir = resources.getBasedir("multimodule");
 
@@ -129,4 +140,17 @@ public class IntegrationTest {
     result.assertErrorFreeLog();
     result.assertLogText("junit:junit:jar:3.8.1:compile");
   }
+
+  @Test
+  public void testVersionless() throws Exception {
+    File basedir = resources.getBasedir("versionless");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .withCliOption("-e") //
+        .execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:3.8.1:compile");
+  }
+
 }

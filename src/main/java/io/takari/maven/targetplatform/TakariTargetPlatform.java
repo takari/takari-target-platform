@@ -42,12 +42,17 @@ public class TakariTargetPlatform {
   // g:a:c:e => { info }
   private final Multimap<String, ArtifactInfo> artifacts;
 
+  // g:a => { Version }
+  private final Multimap<String, Version> versions;
+
   public TakariTargetPlatform(TargetPlatformModel model, Collection<MavenProject> projects) {
     final Multimap<String, ArtifactInfo> artifacts = HashMultimap.create();
+    final Multimap<String, Version> versions = HashMultimap.create();
 
     for (TargetPlatformGAV gav : model.getGavs()) {
       try {
         Version version = versionScheme.parseVersion(gav.getVersion());
+        versions.put(keyGA(gav.getGroupId(), gav.getArtifactId()), version);
         for (TargetPlatformArtifact artifact : gav.getArtifacts()) {
           String key = versionlessKey(gav, artifact);
           String classifier = artifact.getClassifier() != null ? artifact.getClassifier() : "";
@@ -59,18 +64,8 @@ public class TakariTargetPlatform {
       }
     }
 
-    // TODO this logic really belongs to TargetPlatformSessionDecorator
-    for (MavenProject project : projects) {
-      try {
-        String key = key(project.getGroupId(), project.getArtifactId(), "*", "*");
-        Version version = versionScheme.parseVersion(project.getVersion());
-        artifacts.put(key, new ArtifactInfo("*", "*", version, null));
-      } catch (InvalidVersionSpecificationException e) {
-        // ignore, can't happen
-      }
-    }
-
     this.artifacts = Multimaps.unmodifiableMultimap(artifacts);
+    this.versions = Multimaps.unmodifiableMultimap(versions);
   }
 
   public boolean includes(Artifact artifact) {
@@ -95,11 +90,11 @@ public class TakariTargetPlatform {
   }
 
   private Collection<Version> getVersions(Artifact artifact) {
-    Collection<ArtifactInfo> infos = artifacts.get(keyGACE(artifact));
+    Collection<ArtifactInfo> infos = artifacts.get(keyArtifact(artifact));
 
     // hack to support project-project dependencies, remove
     if (infos.isEmpty()) {
-      infos = artifacts.get(keyGA(artifact));
+      infos = artifacts.get(keyArtifactProject(artifact));
     }
 
     Set<Version> versions = new HashSet<>();
@@ -108,6 +103,10 @@ public class TakariTargetPlatform {
     }
 
     return versions;
+  }
+
+  public Collection<Version> getVersions(String groupId, String artifactId) {
+    return versions.get(keyGA(groupId, artifactId));
   }
 
   private boolean contains(VersionRange range, Collection<Version> versions) {
@@ -140,13 +139,17 @@ public class TakariTargetPlatform {
     return sb.toString();
   }
 
-  private static String keyGACE(Artifact artifact) {
+  private static String keyArtifact(Artifact artifact) {
     return key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(),
         artifact.getExtension());
   }
 
-  private static String keyGA(Artifact artifact) {
+  private static String keyArtifactProject(Artifact artifact) {
     return key(artifact.getGroupId(), artifact.getArtifactId(), "*", "*");
+  }
+
+  private static String keyGA(String groupId, String artifactId) {
+    return groupId + ":" + artifactId;
   }
 
   private static String versionlessKey(TargetPlatformGAV gav, TargetPlatformArtifact artifact) {
@@ -156,7 +159,7 @@ public class TakariTargetPlatform {
   }
 
   public String getSHA1(Artifact artifact) throws IOException {
-    for (ArtifactInfo info : artifacts.get(keyGACE(artifact))) {
+    for (ArtifactInfo info : artifacts.get(keyArtifact(artifact))) {
       if (eq(info.classifier, artifact.getClassifier())
           && eq(info.extension, artifact.getExtension())) {
         try {

@@ -1,0 +1,16 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>disabled-parent</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <takari.targetplatform.disable>true</takari.targetplatform.disable>
+  </properties>
+
+  <modules>
+    <module>module</module>
+  </modules>
+</project>

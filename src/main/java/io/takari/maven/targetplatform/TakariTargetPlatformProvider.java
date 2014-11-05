@@ -48,6 +48,13 @@ public class TakariTargetPlatformProvider {
     return targetPlatform;
   }
 
+  public TakariTargetPlatform getTargetPlatform(Properties properties) {
+    if (isDisabled(properties)) {
+      return null;
+    }
+    return targetPlatform;
+  }
+
   private static boolean isDisabled(Properties properties) {
     return Boolean.parseBoolean(properties.getProperty(PROP_DISABLE));
   }

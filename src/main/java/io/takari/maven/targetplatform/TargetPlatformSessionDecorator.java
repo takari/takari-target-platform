@@ -1,20 +1,25 @@
 package io.takari.maven.targetplatform;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.maven.SessionScoped;
+import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.RepositorySessionDecorator;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.SessionData;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.DependencyCollectionContext;
 import org.eclipse.aether.collection.DependencyGraphTransformationContext;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -22,6 +27,7 @@ import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
+import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.traverser.AndDependencyTraverser;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
@@ -33,9 +39,14 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
 
   private final TakariTargetPlatformProvider targetPlatformProvider;
 
+  // g:a:v, as per org.apache.maven.artifact.ArtifactUtils#key(String, String, String)
+  private final Set<String> reactorProjects;
+
   @Inject
-  public TargetPlatformSessionDecorator(TakariTargetPlatformProvider targetPlatformProvider) {
+  public TargetPlatformSessionDecorator(MavenSession session,
+      TakariTargetPlatformProvider targetPlatformProvider) {
     this.targetPlatformProvider = targetPlatformProvider;
+    this.reactorProjects = new HashSet<>(session.getProjectMap().keySet());
   }
 
   @Override
@@ -51,7 +62,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
       @Override
       public void filterVersions(VersionFilterContext context) throws RepositoryException {
         org.eclipse.aether.graph.Dependency dependency = context.getDependency();
-        if ("system".equals(dependency.getScope())) {
+        if (JavaScopes.SYSTEM.equals(dependency.getScope())) {
           return;
         }
         org.eclipse.aether.artifact.Artifact artifact = dependency.getArtifact();
@@ -90,8 +101,9 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
           public boolean visitEnter(DependencyNode node) {
             org.eclipse.aether.graph.Dependency dependency = node.getDependency();
             trail.push(dependency);
-            if (dependency != null && !"system".equals(dependency.getScope())) {
-              if (!targetPlatform.includes(node.getArtifact())) {
+            if (dependency != null && !JavaScopes.SYSTEM.equals(dependency.getScope())) {
+              Artifact artifact = node.getArtifact();
+              if (!isReactorProject(artifact) && !targetPlatform.includes(artifact)) {
                 blocked.add(new ArrayList<org.eclipse.aether.graph.Dependency>(trail));
               }
             }
@@ -130,10 +142,11 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
     DependencyTraverser traverser = new DependencyTraverser() {
       @Override
       public boolean traverseDependency(org.eclipse.aether.graph.Dependency dependency) {
-        if ("system".equals(dependency.getScope())) {
+        if (JavaScopes.SYSTEM.equals(dependency.getScope())) {
           return true;
         }
-        return targetPlatform.includes(dependency.getArtifact());
+        Artifact artifact = dependency.getArtifact();
+        return isReactorProject(artifact) || targetPlatform.includes(artifact);
       }
 
       @Override
@@ -182,4 +195,9 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
     return filtered;
   }
 
+  boolean isReactorProject(Artifact artifact) {
+    String projectKey =
+        ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+    return reactorProjects.contains(projectKey);
+  }
 }
