@@ -48,23 +48,6 @@
           <type>String</type>
           <required>true</required>
         </field>
-        <field xml.attribute="true" xml.tagName="e">
-          <name>extension</name>
-          <version>1.0.0</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field xml.attribute="true" xml.tagName="c">
-          <name>classifier</name>
-          <version>1.0.0</version>
-          <type>String</type>
-        </field>
-        <field xml.attribute="true" xml.tagName="sha1">
-          <name>SHA1</name>
-          <version>1.0.0</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
         <field>
           <name>artifacts</name>
           <association xml.itemsStyle="flat">
