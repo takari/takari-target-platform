@@ -137,9 +137,14 @@
 
                 <Bundle-SymbolicName>io.takari.targetplatform;singleton:=false</Bundle-SymbolicName>
                 <Bundle-RequiredExecutionEnvironment>JavaSE-1.7,JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
-                <Fragment-Host>org.eclipse.m2e.maven.runtime</Fragment-Host>
 
                 <Export-Package>io.takari.maven.targetplatform.*</Export-Package>
+
+                <Require-Bundle>
+                  org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,1.7.0)",
+                  com.google.guava;bundle-version="15.0.0",
+                  org.slf4j.api;bundle-version="1.7.2"
+                </Require-Bundle>
                 <Import-Package>!*</Import-Package>
               </instructions>
             </configuration>
