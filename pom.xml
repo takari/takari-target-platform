@@ -138,7 +138,15 @@
                 <Bundle-SymbolicName>io.takari.targetplatform;singleton:=false</Bundle-SymbolicName>
                 <Bundle-RequiredExecutionEnvironment>JavaSE-1.7,JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
 
-                <Export-Package>io.takari.maven.targetplatform.*</Export-Package>
+                <!--
+                  | explicitly list all generated packages
+                  | https://github.com/tesla/m2eclipse-tycho/issues/24 
+                 -->
+                <Export-Package>
+                  io.takari.maven.targetplatform.*,
+                  io.takari.maven.targetplatform.model,
+                  io.takari.maven.targetplatform.model.io.xpp3
+                </Export-Package>
 
                 <Require-Bundle>
                   org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,1.7.0)",
