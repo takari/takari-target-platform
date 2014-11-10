@@ -29,41 +29,17 @@ public class IntegrationTest {
     File basedir = resources.getBasedir("basic");
 
     MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOption("-Djunit.version=3.8.1").execute("clean", "compile");
+        .execute("clean", "compile");
 
     result.assertErrorFreeLog();
     result.assertLogText("junit:junit:jar:3.8.1:test");
   }
 
   @Test
-  public void testBasic_versionRange() throws Exception {
-    File basedir = resources.getBasedir("basic");
+  public void testDisabledUserProperty() throws Exception {
+    File basedir = resources.getBasedir("disabled-userProperty");
 
     MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOption("-Djunit.version=[3,4)").execute("clean", "compile");
-
-    result.assertErrorFreeLog();
-    result.assertLogText("junit:junit:jar:3.8.1:test");
-  }
-
-  @Test
-  public void testBasic_excluded() throws Exception {
-    File basedir = resources.getBasedir("basic");
-
-    MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOption("-Djunit.version=4.11").execute("clean", "compile");
-
-    result.assertLogText("[ERROR]");
-    result.assertLogText("project build target platform");
-    result.assertLogText("junit:junit:jar:4.11");
-  }
-
-  @Test
-  public void testBasic_userProperty_targetPlatformDisable() throws Exception {
-    File basedir = resources.getBasedir("basic");
-
-    MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOption("-Djunit.version=4.11") //
         .withCliOption("-Dtakari.targetplatform.disable=true") //
         .execute("clean", "compile");
 
@@ -101,10 +77,14 @@ public class IntegrationTest {
   }
 
   @Test
-  public void testDependencyManagement() throws Exception {
-    File basedir = resources.getBasedir("dependencymanagement");
+  public void testTransitiveDependency() throws Exception {
+    File basedir = resources.getBasedir("transitive-dependency");
 
-    maven.forProject(basedir).execute("clean", "compile").assertErrorFreeLog();
+    MavenExecutionResult result = maven.forProject(basedir).execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:4.11:compile");
+    result.assertLogText("org.hamcrest:hamcrest-core:jar:1.2.1:compile");
   }
 
 
@@ -134,7 +114,6 @@ public class IntegrationTest {
     File basedir = resources.getBasedir("pomless");
 
     MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOption("-e") //
         .execute("clean", "compile");
 
     result.assertErrorFreeLog();
@@ -146,11 +125,50 @@ public class IntegrationTest {
     File basedir = resources.getBasedir("versionless");
 
     MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOption("-e") //
         .execute("clean", "compile");
 
     result.assertErrorFreeLog();
     result.assertLogText("junit:junit:jar:3.8.1:compile");
   }
 
+  @Test
+  public void testVersionless_noversion() throws Exception {
+    File basedir = resources.getBasedir("versionless-noversion");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertLogText("'dependencies.dependency.version' for junit:junit:jar is missing");
+  }
+
+  @Test
+  public void testVersionless_ambiguousVersion() throws Exception {
+    File basedir = resources.getBasedir("versionless-ambiguousVersion");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result
+        .assertLogText("Cannot inject dependency version, ambiguous target platform artifact match");
+  }
+
+  @Test
+  public void testDependencyVersion() throws Exception {
+    File basedir = resources.getBasedir("dependency-version");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertLogText("Version specification is not allowed @ line 17, column 16");
+  }
+
+  @Test
+  public void testDependencyManagementVersion() throws Exception {
+    File basedir = resources.getBasedir("dependencyManagement-version");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertLogText("Version specification is not allowed @ line 25, column 18");
+  }
 }

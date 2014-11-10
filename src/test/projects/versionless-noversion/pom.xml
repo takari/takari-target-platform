@@ -2,8 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>checksum-jar</artifactId>
+  <artifactId>versionless-noversion</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  
+  <!--
+    | Assert build failure when target platform does not include any dependency version   
+   -->
 
   <dependencies>
     <dependency>
@@ -11,4 +15,5 @@
       <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
+
 </project>

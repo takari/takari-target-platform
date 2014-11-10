@@ -2,8 +2,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>versionless-invalid</artifactId>
+  <artifactId>transitive-dependency</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
+  <description>
+  The point of this test is to validate that target platform filtering is 
+  enforced for indirect dependencies. 
+
+  junit 4.11 depends on hamcrest-core 1.3, but target platform includes
+  hamcrest-core 1.2.1
+
+  Dependency resolution is expected to succeed and include hamcrest-core 1.2.1
+  </description>
 
   <dependencies>
     <dependency>

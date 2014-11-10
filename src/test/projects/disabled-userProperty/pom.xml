@@ -2,13 +2,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>pomless</artifactId>
+  <artifactId>disabled-userProperty</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

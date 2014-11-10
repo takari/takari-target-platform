@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>basic</artifactId>
+  <artifactId>disabled</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
   <properties>
