@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<target-platform>
+  <gav g="junit" a="junit" v="4.11">
+    <artifact e="pom" sha1="cddf7490ffe839978cf5d6c944c01f2a8cb70a49" />
+    <artifact e="jar" sha1="4e031bb61df09069aeb2bffb4019e7a5034a4ee0" />
+  </gav>
+  <gav g="org.hamcrest" a="hamcrest-core" v="1.2.1">
+    <artifact e="pom" sha1="aa1ab673b2651328a302126b33f90b1eacdfa168" />
+    <artifact e="jar" sha1="e89706d7a0641823a7d3f20c2b96272f622d155c" />
+  </gav>
+</target-platform>
