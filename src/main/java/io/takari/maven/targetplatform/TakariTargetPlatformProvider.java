@@ -48,10 +48,7 @@ public class TakariTargetPlatformProvider {
     return targetPlatform;
   }
 
-  public TakariTargetPlatform getTargetPlatform(Properties properties) {
-    if (isDisabled(properties)) {
-      return null;
-    }
+  public TakariTargetPlatform getTargetPlatform() {
     return targetPlatform;
   }
 

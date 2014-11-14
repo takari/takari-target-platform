@@ -2,20 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>basic</artifactId>
+  <artifactId>multimodule-module-b</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-
-  <!--
-    | the point of this test is to assert build failure when dependency version is
-    | specified for project pom. 
-   -->
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
     </dependency>
   </dependencies>
-
 </project>

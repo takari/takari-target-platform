@@ -160,27 +160,17 @@ public class IntegrationTest {
     MavenExecutionResult result = maven.forProject(basedir) //
         .execute("clean", "compile");
 
-    result
-        .assertLogText("Cannot inject dependency version, ambiguous target platform artifact match");
+    result.assertLogText("'dependencies.dependency.version' for junit:junit:jar is missing");
   }
 
   @Test
-  public void testDependencyVersion() throws Exception {
-    File basedir = resources.getBasedir("dependency-version");
+  public void testVersionless_partiallyDisabled() throws Exception {
+    File basedir = resources.getBasedir("versionless-partially-disabled");
 
     MavenExecutionResult result = maven.forProject(basedir) //
         .execute("clean", "compile");
 
-    result.assertLogText("Version specification is not allowed @ line 17, column 16");
-  }
-
-  @Test
-  public void testDependencyManagementVersion() throws Exception {
-    File basedir = resources.getBasedir("dependencyManagement-version");
-
-    MavenExecutionResult result = maven.forProject(basedir) //
-        .execute("clean", "compile");
-
-    result.assertLogText("Version specification is not allowed @ line 25, column 18");
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:3.8.1:compile");
   }
 }
