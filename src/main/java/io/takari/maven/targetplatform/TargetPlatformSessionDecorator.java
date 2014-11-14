@@ -1,17 +1,17 @@
 package io.takari.maven.targetplatform;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.maven.SessionScoped;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.RepositorySessionDecorator;
@@ -31,22 +31,38 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.traverser.AndDependencyTraverser;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionRange;
+import org.eclipse.aether.version.VersionScheme;
 
 @Named
 @SessionScoped
 public class TargetPlatformSessionDecorator implements RepositorySessionDecorator {
 
+  private static final VersionScheme versionScheme = new GenericVersionScheme();
+
   private final TakariTargetPlatformProvider targetPlatformProvider;
 
-  // g:a:v, as per org.apache.maven.artifact.ArtifactUtils#key(String, String, String)
-  private final Set<String> reactorProjects;
+  // g:a => version
+  private final Map<String, Version> reactorProjects;
 
   @Inject
   public TargetPlatformSessionDecorator(MavenSession session,
       TakariTargetPlatformProvider targetPlatformProvider) {
     this.targetPlatformProvider = targetPlatformProvider;
-    this.reactorProjects = new HashSet<>(session.getProjectMap().keySet());
+    Map<String, Version> reactorProjects = new HashMap<>();
+    for (MavenProject project : session.getProjectMap().values()) {
+      try {
+        String key = keyGA(project.getGroupId(), project.getArtifactId());
+        Version version = versionScheme.parseVersion(project.getVersion());
+        reactorProjects.put(key, version);
+      } catch (InvalidVersionSpecificationException e) {
+        // TODO decide what to do about this, if this ever happens
+      }
+    }
+    this.reactorProjects = Collections.unmodifiableMap(reactorProjects);
   }
 
   @Override
@@ -69,7 +85,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
         Iterator<Version> versions = context.iterator();
         while (versions.hasNext()) {
           Version version = versions.next();
-          if (!targetPlatform.includes(artifact, version)) {
+          if (!isReactorVersion(artifact, version) && !targetPlatform.includes(artifact, version)) {
             versions.remove();
           }
         }
@@ -195,9 +211,32 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
     return filtered;
   }
 
+  private static String keyGA(String groupId, String artifactId) {
+    return groupId + ":" + artifactId;
+  }
+
+  boolean isReactorVersion(Artifact artifact, Version version) {
+    String key = keyGA(artifact.getGroupId(), artifact.getArtifactId());
+    Version reactorVersion = reactorProjects.get(key);
+    return reactorVersion != null && reactorVersion.equals(version);
+  }
+
   boolean isReactorProject(Artifact artifact) {
-    String projectKey =
-        ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
-    return reactorProjects.contains(projectKey);
+    String key = keyGA(artifact.getGroupId(), artifact.getArtifactId());
+    Version reactorVersion = reactorProjects.get(key);
+    if (reactorVersion != null) {
+      try {
+        VersionRange range = versionScheme.parseVersionRange(artifact.getVersion());
+        return range.containsVersion(reactorVersion);
+      } catch (InvalidVersionSpecificationException e) {
+        try {
+          Version version = versionScheme.parseVersion(artifact.getVersion());
+          return reactorVersion.equals(version);
+        } catch (InvalidVersionSpecificationException e2) {
+          // generic versioning scheme allows any version string, this exception is never thrown
+        }
+      }
+    }
+    return false;
   }
 }

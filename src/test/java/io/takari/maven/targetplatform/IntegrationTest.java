@@ -77,6 +77,16 @@ public class IntegrationTest {
   }
 
   @Test
+  public void testMultimoduleVersionrange() throws Exception {
+    File basedir = resources.getBasedir("multimodule-versionrange");
+
+    MavenExecutionResult result = maven.forProject(basedir).execute("clean", "compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:3.8.1:compile");
+  }
+
+  @Test
   public void testTransitiveDependency() throws Exception {
     File basedir = resources.getBasedir("transitive-dependency");
 
