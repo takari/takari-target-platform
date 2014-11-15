@@ -8,7 +8,7 @@
 
   <properties>
     <apache-maven.version>3.2.4-SNAPSHOT</apache-maven.version>
-    <takari-lifecycle.version>1.9.0-SNAPSHOT</takari-lifecycle.version>
+    <takari-lifecycle.version>1.8.5</takari-lifecycle.version>
     <guava.version>14.0.1</guava.version>
 
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
