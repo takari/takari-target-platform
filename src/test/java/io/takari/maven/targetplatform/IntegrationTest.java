@@ -8,6 +8,7 @@ import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -182,5 +183,16 @@ public class IntegrationTest {
 
     result.assertErrorFreeLog();
     result.assertLogText("junit:junit:jar:3.8.1:compile");
+  }
+
+  @Test
+  @Ignore("Reactor project-project version injection does not belong to the target platform")
+  public void testVersionless_multimodule() throws Exception {
+    File basedir = resources.getBasedir("versionless-multimodule");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertErrorFreeLog();
   }
 }
