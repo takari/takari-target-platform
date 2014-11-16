@@ -25,6 +25,40 @@
         <extensions>true</extensions>
       </plugin>
     </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>1.1</version>
+          <executions>
+            <execution>
+              <id>generate-index</id>
+              <goals>
+                <goal>main-index</goal>
+                <goal>test-index</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>io.takari.maven.plugins</groupId>
+          <artifactId>takari-plugin-testing-plugin</artifactId>
+          <version>${takari-lifecycle.version}</version>
+          <executions>
+            <execution>
+              <id>test-properties</id>
+              <goals>
+                <goal>testProperties</goal>
+              </goals>
+              <phase>process-test-resources</phase>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
 </project>

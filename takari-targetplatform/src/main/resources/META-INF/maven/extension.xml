@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  | As of version 3.2.4-SNAPSHOT, Maven does not appear to respect this file
+  | for core extensions, i.e. extensions deployed to $M2_HOME/lib/ext 
+ -->
+<extension>
+  <exportedPackages>
+    <exportedPackage>io.takari.maven.targetplatform</exportedPackage>
+  </exportedPackages>
+
+  <exportedArtifacts>
+    <exportedArtifact>io.takari.maven:takari-targetplatform</exportedArtifact>
+  </exportedArtifacts>
+</extension>
