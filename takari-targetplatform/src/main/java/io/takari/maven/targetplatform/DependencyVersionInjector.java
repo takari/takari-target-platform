@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.InputLocation;
@@ -16,6 +15,10 @@ import org.apache.maven.model.management.DependencyManagementInjector;
 import org.eclipse.aether.version.Version;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.OutOfScopeException;
+import com.google.inject.Provider;
+import com.google.inject.ProvisionException;
+import com.google.inject.internal.Errors;
 
 public class DependencyVersionInjector extends DefaultDependencyManagementInjector implements
     DependencyManagementInjector {
@@ -46,7 +49,22 @@ public class DependencyVersionInjector extends DefaultDependencyManagementInject
       return;
     }
 
-    TakariTargetPlatform targetPlatform = targetPlatformProvider.get().getTargetPlatform();
+    TakariTargetPlatform targetPlatform;
+
+    try {
+      targetPlatform = targetPlatformProvider.get().getTargetPlatform();
+    } catch (ProvisionException e) {
+      // TODO remove, production code should not need to handle test-specific exception
+      //
+      // dependency version injection happens very early in the build
+      // when project Model instances are constructed. this is too early
+      // to inject reactor project-project dependencies and should be moved
+      // at a later build state, possibly as part of dependency resolution
+      if (!(Errors.getOnlyCause(e.getErrorMessages()) instanceof OutOfScopeException)) {
+        throw e;
+      }
+      targetPlatform = null;
+    }
 
     if (targetPlatform == null) {
       return;
