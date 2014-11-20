@@ -30,6 +30,14 @@ import com.google.inject.AbstractModule;
 
 public class FilteredArtifactResolver implements ArtifactResolver {
 
+  @Named
+  public static class Module extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(ArtifactResolver.class).to(FilteredArtifactResolver.class);
+    }
+  }
+
   private Logger log = LoggerFactory.getLogger(getClass());
 
   private final DefaultArtifactResolver resolver;
@@ -121,13 +129,5 @@ public class FilteredArtifactResolver implements ArtifactResolver {
       return blocked;
     }
     return Collections.emptyList();
-  }
-
-  @Named
-  public static class Module extends AbstractModule {
-    @Override
-    protected void configure() {
-      bind(ArtifactResolver.class).to(FilteredArtifactResolver.class);
-    }
   }
 }

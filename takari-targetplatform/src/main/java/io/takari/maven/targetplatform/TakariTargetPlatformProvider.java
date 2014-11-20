@@ -19,7 +19,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @Named
 @SessionScoped
-public class TakariTargetPlatformProvider {
+public class TakariTargetPlatformProvider implements TargetPlatformProvider {
 
   public static final String PROP_DISABLE = "takari.targetplatform.disable";
 
@@ -34,21 +34,23 @@ public class TakariTargetPlatformProvider {
       if (file.isFile() && file.canRead()) {
         try (InputStream is = new FileInputStream(file)) {
           TargetPlatformModel model = new TargetPlatformModelXpp3Reader().read(is);
-          targetPlatform = new TakariTargetPlatform(model, session.getAllProjects());
+          targetPlatform = new TakariTargetPlatform(model);
         }
       }
     }
     this.targetPlatform = targetPlatform;
   }
 
-  public TakariTargetPlatform getTargetPlatform(MavenProject project) {
+  @Override
+  public TakariTargetPlatform getProjectTargetPlatform(MavenProject project) {
     if (isDisabled(project.getProperties())) {
       return null;
     }
     return targetPlatform;
   }
 
-  public TakariTargetPlatform getTargetPlatform() {
+  @Override
+  public TakariTargetPlatform getSessionTargetPlatform() {
     return targetPlatform;
   }
 

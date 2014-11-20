@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
@@ -45,7 +44,7 @@ public class TakariTargetPlatform {
   // g:a => { Version }
   private final Multimap<String, Version> versions;
 
-  public TakariTargetPlatform(TargetPlatformModel model, Collection<MavenProject> projects) {
+  public TakariTargetPlatform(TargetPlatformModel model) {
     final Multimap<String, ArtifactInfo> artifacts = HashMultimap.create();
     final Multimap<String, Version> versions = HashMultimap.create();
 

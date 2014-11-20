@@ -43,14 +43,14 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
 
   private static final VersionScheme versionScheme = new GenericVersionScheme();
 
-  private final TakariTargetPlatformProvider targetPlatformProvider;
+  private final TargetPlatformProvider targetPlatformProvider;
 
   // g:a => version
   private final Map<String, Version> reactorProjects;
 
   @Inject
   public TargetPlatformSessionDecorator(MavenSession session,
-      TakariTargetPlatformProvider targetPlatformProvider) {
+      TargetPlatformProvider targetPlatformProvider) {
     this.targetPlatformProvider = targetPlatformProvider;
     Map<String, Version> reactorProjects = new HashMap<>();
     for (MavenProject project : session.getProjectMap().values()) {
@@ -69,7 +69,8 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
   public RepositorySystemSession decorate(final MavenProject project,
       final RepositorySystemSession session) {
 
-    final TakariTargetPlatform targetPlatform = targetPlatformProvider.getTargetPlatform(project);
+    final TakariTargetPlatform targetPlatform =
+        targetPlatformProvider.getProjectTargetPlatform(project);
     if (targetPlatform == null) {
       return null;
     }

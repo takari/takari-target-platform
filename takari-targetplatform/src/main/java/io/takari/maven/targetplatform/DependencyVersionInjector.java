@@ -33,10 +33,10 @@ public class DependencyVersionInjector extends DefaultDependencyManagementInject
     }
   }
 
-  private final Provider<TakariTargetPlatformProvider> targetPlatformProvider;
+  private final Provider<TargetPlatformProvider> targetPlatformProvider;
 
   @Inject
-  public DependencyVersionInjector(Provider<TakariTargetPlatformProvider> targetPlatformProvider) {
+  public DependencyVersionInjector(Provider<TargetPlatformProvider> targetPlatformProvider) {
     this.targetPlatformProvider = targetPlatformProvider;
   }
 
@@ -52,7 +52,7 @@ public class DependencyVersionInjector extends DefaultDependencyManagementInject
     TakariTargetPlatform targetPlatform;
 
     try {
-      targetPlatform = targetPlatformProvider.get().getTargetPlatform();
+      targetPlatform = targetPlatformProvider.get().getSessionTargetPlatform();
     } catch (ProvisionException e) {
       // TODO remove, production code should not need to handle test-specific exception
       //
