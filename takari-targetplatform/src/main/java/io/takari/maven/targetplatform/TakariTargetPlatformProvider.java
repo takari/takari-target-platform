@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,5 +56,10 @@ public class TakariTargetPlatformProvider implements TargetPlatformProvider {
   @Override
   public boolean isStrict(MavenProject project) {
     return Boolean.parseBoolean(project.getProperties().getProperty(PROP_STRICT, "true"));
+  }
+
+  // used by m2e integration
+  public static boolean isStrict(Properties properties) {
+    return Boolean.parseBoolean(properties.getProperty(PROP_STRICT, "true"));
   }
 }
