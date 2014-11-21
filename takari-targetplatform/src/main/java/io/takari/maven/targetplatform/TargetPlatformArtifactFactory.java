@@ -95,26 +95,24 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
       effectiveScope = Artifact.SCOPE_COMPILE;
     }
 
-    if (dependency.getVersion() != null) {
-      throw new InvalidVersionSpecificationException("Dependency version is not allowed");
-    }
+    VersionRange version;
 
-    Version version = reactorProjects.getReactorVersion(groupId, artifactId);
-
-    if (version == null) {
-      Collection<Version> versions = targetPlatform.getVersions(groupId, artifactId);
-      if (versions.size() != 1) {
-        throw new InvalidVersionSpecificationException("Cannot inject version: " + versions);
+    if (Artifact.SCOPE_SYSTEM.equals(effectiveScope)) {
+      version = VersionRange.createFromVersionSpec(dependency.getVersion());
+    } else {
+      if (dependency.getVersion() != null) {
+        throw new InvalidVersionSpecificationException("Dependency version is not allowed");
       }
-      version = versions.iterator().next();
+      version = getReactorVersion(reactorProjects, groupId, artifactId);
+      if (version == null) {
+        version = getTargetPlatformVersion(targetPlatform, groupId, artifactId);
+      }
     }
-
-    VersionRange versionRange = VersionRange.createFromVersionSpec(version.toString());
 
     Artifact artifact = factory.createDependencyArtifact( //
         groupId, //
         artifactId, //
-        versionRange, //
+        version, //
         dependency.getType(), //
         dependency.getClassifier(), //
         effectiveScope, //
@@ -127,6 +125,22 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
     artifact.setDependencyFilter(createDependencyFilter(dependency));
 
     return artifact;
+  }
+
+  private VersionRange getTargetPlatformVersion(TakariTargetPlatform targetPlatform,
+      final String groupId, final String artifactId) throws InvalidVersionSpecificationException {
+    Collection<Version> versions = targetPlatform.getVersions(groupId, artifactId);
+    if (versions.size() != 1) {
+      throw new InvalidVersionSpecificationException("Cannot inject version: " + versions);
+    }
+    Version version = versions.iterator().next();
+    return VersionRange.createFromVersionSpec(version.toString());
+  }
+
+  private VersionRange getReactorVersion(ReactorProjects reactorProjects, final String groupId,
+      final String artifactId) throws InvalidVersionSpecificationException {
+    Version version = reactorProjects.getReactorVersion(groupId, artifactId);
+    return version != null ? VersionRange.createFromVersionSpec(version.toString()) : null;
   }
 
 
