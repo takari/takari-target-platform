@@ -21,6 +21,7 @@ import org.eclipse.aether.collection.DependencyGraphTransformationContext;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.collection.VersionFilter;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
 import org.eclipse.aether.util.artifact.JavaScopes;
@@ -56,7 +57,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
     VersionFilter versionFilter = new VersionFilter() {
       @Override
       public void filterVersions(VersionFilterContext context) throws RepositoryException {
-        org.eclipse.aether.graph.Dependency dependency = context.getDependency();
+        Dependency dependency = context.getDependency();
         if (JavaScopes.SYSTEM.equals(dependency.getScope())) {
           return;
         }
@@ -81,11 +82,9 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
       @Override
       public DependencyNode transformGraph(DependencyNode node,
           DependencyGraphTransformationContext context) throws RepositoryException {
-        final List<List<org.eclipse.aether.graph.Dependency>> blocked =
-            new ArrayList<List<org.eclipse.aether.graph.Dependency>>();
+        final List<List<Dependency>> blocked = new ArrayList<>();
         node.accept(new DependencyVisitor() {
-          final Stack<org.eclipse.aether.graph.Dependency> trail =
-              new Stack<org.eclipse.aether.graph.Dependency>();
+          final Stack<Dependency> trail = new Stack<>();
 
           @Override
           public boolean visitLeave(DependencyNode node) {
@@ -95,14 +94,14 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
 
           @Override
           public boolean visitEnter(DependencyNode node) {
-            org.eclipse.aether.graph.Dependency dependency = node.getDependency();
+            Dependency dependency = node.getDependency();
             trail.push(dependency);
             if (dependency != null && !JavaScopes.SYSTEM.equals(dependency.getScope())) {
               Artifact artifact = node.getArtifact();
               if (!reactorProjects.isReactorProject(artifact.getGroupId(),
                   artifact.getArtifactId(), artifact.getVersion())
                   && !targetPlatform.includes(artifact)) {
-                blocked.add(new ArrayList<org.eclipse.aether.graph.Dependency>(trail));
+                blocked.add(new ArrayList<>(trail));
               }
             }
             return true;
@@ -113,7 +112,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
           StringBuilder message =
               new StringBuilder("Artifacts are not part of the project build target platform:");
           for (int blockedIdx = 0; blockedIdx < blocked.size(); blockedIdx++) {
-            List<org.eclipse.aether.graph.Dependency> trail = blocked.get(blockedIdx);
+            List<Dependency> trail = blocked.get(blockedIdx);
 
             message.append("\n").append(blockedIdx).append(". ");
             message.append(trail.get(trail.size() - 1).getArtifact());
@@ -139,7 +138,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
 
     DependencyTraverser traverser = new DependencyTraverser() {
       @Override
-      public boolean traverseDependency(org.eclipse.aether.graph.Dependency dependency) {
+      public boolean traverseDependency(Dependency dependency) {
         if (JavaScopes.SYSTEM.equals(dependency.getScope())) {
           return true;
         }
