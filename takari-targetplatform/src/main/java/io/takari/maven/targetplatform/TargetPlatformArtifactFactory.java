@@ -130,8 +130,14 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
   private VersionRange getTargetPlatformVersion(TakariTargetPlatform targetPlatform,
       final String groupId, final String artifactId) throws InvalidVersionSpecificationException {
     Collection<Version> versions = targetPlatform.getVersions(groupId, artifactId);
-    if (versions.size() != 1) {
-      throw new InvalidVersionSpecificationException("Cannot inject version: " + versions);
+    if (versions.isEmpty()) {
+      throw new InvalidVersionSpecificationException(
+          "Artifact is not part of the build target platform: " + groupId + ":" + artifactId);
+    }
+    if (versions.size() > 1) {
+      throw new InvalidVersionSpecificationException(
+          "Ambiguous build target platform artifact version: " + groupId + ":" + artifactId + ":"
+              + versions);
     }
     Version version = versions.iterator().next();
     return VersionRange.createFromVersionSpec(version.toString());

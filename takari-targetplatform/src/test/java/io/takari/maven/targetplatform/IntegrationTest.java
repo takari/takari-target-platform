@@ -161,7 +161,7 @@ public class IntegrationTest {
     MavenExecutionResult result = maven.forProject(basedir) //
         .execute("clean", "compile");
 
-    result.assertLogText("'dependencies.dependency.version' for junit:junit:jar is missing");
+    result.assertLogText("Artifact is not part of the build target platform: junit:junit");
   }
 
   @Test
@@ -171,7 +171,8 @@ public class IntegrationTest {
     MavenExecutionResult result = maven.forProject(basedir) //
         .execute("clean", "compile");
 
-    result.assertLogText("'dependencies.dependency.version' for junit:junit:jar is missing");
+    result
+        .assertLogText("Ambiguous build target platform artifact version: junit:junit:[3.8.1, 3.8.2]");
   }
 
   @Test
