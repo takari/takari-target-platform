@@ -51,7 +51,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
       final RepositorySystemSession session) {
 
     final TakariTargetPlatform targetPlatform = targetPlatformProvider.getTargetPlatform(project);
-    if (targetPlatform == null) {
+    if (targetPlatform == null || !targetPlatformProvider.isStrict(project)) {
       return null;
     }
 
@@ -62,7 +62,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
         if (JavaScopes.SYSTEM.equals(dependency.getScope())) {
           return;
         }
-        org.eclipse.aether.artifact.Artifact artifact = dependency.getArtifact();
+        Artifact artifact = dependency.getArtifact();
         Iterator<Version> versions = context.iterator();
         while (versions.hasNext()) {
           Version version = versions.next();

@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>disabled-parent</artifactId>
+  <artifactId>nonstrict-parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
-    <takari.targetplatform.disable>true</takari.targetplatform.disable>
+    <takari.targetplatform.strict>false</takari.targetplatform.strict>
   </properties>
 
   <modules>

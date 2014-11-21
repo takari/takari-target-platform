@@ -2,19 +2,19 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>versionless-partially-disabled</artifactId>
+  <artifactId>nonstrict-mixed</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <!--
     | The point of this test is to validate version injection in modules with
-    | disabled target platform support.
+    | nonstrict target platform support.
     |
     |     module-a -> junit
     |             \-> module-b -> junit
     |
-    | target platform support is disabled for module-a, enabled for module-b
-    | module-a is supposed to get junit version from the target platform.
+    | target platform support is nonstrict for module-a, strict for module-b
+    | module-a is still supposed to get junit version from the target platform.
     |
     | This is an edge case and such mixed projects may not be supported in the
     | future.

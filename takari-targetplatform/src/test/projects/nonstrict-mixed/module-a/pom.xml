@@ -2,15 +2,22 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>disabled-userProperty</artifactId>
+  <artifactId>nonstrict-mixed-module-a</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
+  <properties>
+    <takari.targetplatform.strict>false</takari.targetplatform.strict>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.takari.maven.targetplatform.tests</groupId>
+      <artifactId>nonstrict-mixed-module-b</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -32,4 +39,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

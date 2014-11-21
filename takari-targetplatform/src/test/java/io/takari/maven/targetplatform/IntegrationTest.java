@@ -39,20 +39,8 @@ public class IntegrationTest {
   }
 
   @Test
-  public void testDisabledUserProperty() throws Exception {
-    File basedir = resources.getBasedir("disabled-userProperty");
-
-    MavenExecutionResult result = maven.forProject(basedir) //
-        .withCliOption("-Dtakari.targetplatform.disable=true") //
-        .execute("clean", "compile");
-
-    result.assertErrorFreeLog();
-    result.assertLogText("junit:junit:jar:4.11:test");
-  }
-
-  @Test
-  public void testDisabled() throws Exception {
-    File basedir = resources.getBasedir("disabled");
+  public void testNonstrict() throws Exception {
+    File basedir = resources.getBasedir("nonstrict");
 
     MavenExecutionResult result = maven.forProject(basedir) //
         .execute("clean", "compile");
@@ -62,14 +50,14 @@ public class IntegrationTest {
   }
 
   @Test
-  public void testDisabledParent() throws Exception {
-    File basedir = resources.getBasedir("disabled-parent");
+  public void testNonstrictParent() throws Exception {
+    File basedir = resources.getBasedir("nonstrict-parent");
 
     MavenExecutionResult result = maven.forProject(basedir) //
         .execute("clean", "compile");
 
     result.assertErrorFreeLog();
-    result.assertLogText("junit:junit:jar:4.11:test");
+    result.assertLogText("junit:junit:jar:4.11");
   }
 
   @Test
@@ -176,13 +164,23 @@ public class IntegrationTest {
   }
 
   @Test
-  public void testVersionless_partiallyDisabled() throws Exception {
-    File basedir = resources.getBasedir("versionless-partially-disabled");
+  public void testNonstrictMixed() throws Exception {
+    File basedir = resources.getBasedir("nonstrict-mixed");
 
     MavenExecutionResult result = maven.forProject(basedir) //
         .execute("clean", "compile");
 
     result.assertErrorFreeLog();
     result.assertLogText("junit:junit:jar:3.8.1:compile");
+  }
+
+  @Test
+  public void testLegacy() throws Exception {
+    File basedir = resources.getBasedir("legacy");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertErrorFreeLog();
   }
 }

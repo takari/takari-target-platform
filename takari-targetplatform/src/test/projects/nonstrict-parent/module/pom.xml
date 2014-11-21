@@ -3,19 +3,18 @@
 
   <parent>
     <groupId>io.takari.maven.targetplatform.tests</groupId>
-    <artifactId>disabled-parent</artifactId>
+    <artifactId>nonstrict-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>disabled-module</artifactId>
+  <artifactId>nonstrict-module</artifactId>
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 

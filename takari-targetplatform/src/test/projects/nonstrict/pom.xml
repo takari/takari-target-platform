@@ -2,22 +2,19 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>multimodule-module-a</artifactId>
+  <artifactId>nonstrict</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
   <properties>
-    <takari.targetplatform.disable>true</takari.targetplatform.disable>
+    <takari.targetplatform.strict>false</takari.targetplatform.strict>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.takari.maven.targetplatform.tests</groupId>
-      <artifactId>multimodule-module-b</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>4.11</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -39,5 +36,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

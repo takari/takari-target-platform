@@ -17,7 +17,6 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.lifecycle.internal.DefaultProjectArtifactFactory;
 import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -44,27 +43,22 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
 
   private final Provider<ReactorProjects> reactorProjects;
 
-  private final DefaultProjectArtifactFactory delegate;
-
   @Inject
   public TargetPlatformArtifactFactory(ArtifactFactory factory,
       Provider<TargetPlatformProvider> targetPlatformProvider,
-      Provider<ReactorProjects> reactorProjects, DefaultProjectArtifactFactory delegate) {
+      Provider<ReactorProjects> reactorProjects) {
     this.factory = factory;
     this.targetPlatformProvider = targetPlatformProvider;
     this.reactorProjects = reactorProjects;
-    this.delegate = delegate;
   }
 
   @Override
   public Set<Artifact> createArtifacts(MavenProject project)
       throws InvalidDependencyVersionException {
 
-    TakariTargetPlatform targetPlatform = targetPlatformProvider.get().getTargetPlatform(project);
-
-    if (targetPlatform == null) {
-      return delegate.createArtifacts(project);
-    }
+    TargetPlatformProvider targetPlatformProvider = this.targetPlatformProvider.get();
+    TakariTargetPlatform targetPlatform = targetPlatformProvider.getTargetPlatform(project);
+    boolean strict = targetPlatformProvider.isStrict(project);
 
     ReactorProjects reactorProjects = this.reactorProjects.get();
 
@@ -72,7 +66,7 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
     for (Dependency dependency : project.getDependencies()) {
       Artifact artifact;
       try {
-        artifact = createDependencyArtifact(targetPlatform, reactorProjects, dependency);
+        artifact = createDependencyArtifact(targetPlatform, reactorProjects, strict, dependency);
       } catch (InvalidVersionSpecificationException e) {
         throw new InvalidDependencyVersionException(project.getId(), dependency, project.getFile(),
             e);
@@ -84,7 +78,7 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
 
   // adopted from org.apache.maven.project.artifact.MavenMetadataSource#createDependencyArtifact
   private Artifact createDependencyArtifact(TakariTargetPlatform targetPlatform,
-      ReactorProjects reactorProjects, Dependency dependency)
+      ReactorProjects reactorProjects, boolean strict, Dependency dependency)
       throws InvalidVersionSpecificationException {
 
     final String groupId = dependency.getGroupId();
@@ -97,10 +91,18 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
 
     VersionRange version;
 
-    if (Artifact.SCOPE_SYSTEM.equals(effectiveScope)) {
-      version = VersionRange.createFromVersionSpec(dependency.getVersion());
+    String dependencyVersion = dependency.getVersion();
+    if (targetPlatform == null) {
+      // this is a legacy project, target platform rules do not apply
+      version = VersionRange.createFromVersionSpec(dependencyVersion);
+    } else if (Artifact.SCOPE_SYSTEM.equals(effectiveScope)) {
+      // target platform does not manage system-scoped dependencies
+      version = VersionRange.createFromVersionSpec(dependencyVersion);
+    } else if (!strict && dependencyVersion != null) {
+      // in non-strict mode, use provided dependency versions
+      version = VersionRange.createFromVersionSpec(dependencyVersion);
     } else {
-      if (dependency.getVersion() != null) {
+      if (dependencyVersion != null) {
         throw new InvalidVersionSpecificationException("Dependency version is not allowed");
       }
       version = getReactorVersion(reactorProjects, groupId, artifactId);
