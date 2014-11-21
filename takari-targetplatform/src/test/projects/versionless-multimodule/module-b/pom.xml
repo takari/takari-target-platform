@@ -1,8 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-
-  <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>multimodule-module-b</artifactId>
-  <version>0.1</version>
-
-</project>

@@ -9,7 +9,6 @@
     <dependency>
       <groupId>io.takari.maven.targetplatform.tests</groupId>
       <artifactId>multimodule-module-b</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

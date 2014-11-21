@@ -41,11 +41,15 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
 
   private final Provider<TargetPlatformProvider> targetPlatformProvider;
 
+  private final Provider<ReactorProjects> reactorProjects;
+
   @Inject
   public TargetPlatformArtifactFactory(ArtifactFactory factory,
-      Provider<TargetPlatformProvider> targetPlatformProvider) {
+      Provider<TargetPlatformProvider> targetPlatformProvider,
+      Provider<ReactorProjects> reactorProjects) {
     this.factory = factory;
     this.targetPlatformProvider = targetPlatformProvider;
+    this.reactorProjects = reactorProjects;
   }
 
   @Override
@@ -53,12 +57,13 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
       throws InvalidDependencyVersionException {
 
     TakariTargetPlatform targetPlatform = targetPlatformProvider.get().getTargetPlatform(project);
+    ReactorProjects reactorProjects = this.reactorProjects.get();
 
     Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
     for (Dependency dependency : project.getDependencies()) {
       Artifact artifact;
       try {
-        artifact = createDependencyArtifact(targetPlatform, dependency);
+        artifact = createDependencyArtifact(targetPlatform, reactorProjects, dependency);
       } catch (InvalidVersionSpecificationException e) {
         throw new InvalidDependencyVersionException(project.getId(), dependency, project.getFile(),
             e);
@@ -70,33 +75,37 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
 
   // adopted from org.apache.maven.project.artifact.MavenMetadataSource#createDependencyArtifact
   private Artifact createDependencyArtifact(TakariTargetPlatform targetPlatform,
-      Dependency dependency) throws InvalidVersionSpecificationException {
+      ReactorProjects reactorProjects, Dependency dependency)
+      throws InvalidVersionSpecificationException {
+
+    final String groupId = dependency.getGroupId();
+    final String artifactId = dependency.getArtifactId();
+
     String effectiveScope = dependency.getScope();
     if (effectiveScope == null) {
       effectiveScope = Artifact.SCOPE_COMPILE;
     }
 
-    String version = dependency.getVersion();
-
-    if (version != null) {
+    if (dependency.getVersion() != null) {
       throw new InvalidVersionSpecificationException("Dependency version is not allowed");
     }
 
-    Collection<Version> versions =
-        targetPlatform.getVersions(dependency.getGroupId(), dependency.getArtifactId());
+    Version version = reactorProjects.getReactorVersion(groupId, artifactId);
 
-    if (versions.size() != 1) {
-      throw new InvalidVersionSpecificationException("Cannot inject version: " + versions);
+    if (version == null) {
+      Collection<Version> versions = targetPlatform.getVersions(groupId, artifactId);
+      if (versions.size() != 1) {
+        throw new InvalidVersionSpecificationException("Cannot inject version: " + versions);
+      }
+      version = versions.iterator().next();
     }
 
-    version = versions.iterator().next().toString();
-
-    VersionRange effectiveVersion = VersionRange.createFromVersionSpec(version);
+    VersionRange versionRange = VersionRange.createFromVersionSpec(version.toString());
 
     Artifact artifact = factory.createDependencyArtifact( //
-        dependency.getGroupId(), //
-        dependency.getArtifactId(), //
-        effectiveVersion, //
+        groupId, //
+        artifactId, //
+        versionRange, //
         dependency.getType(), //
         dependency.getClassifier(), //
         effectiveScope, //
