@@ -70,7 +70,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
       final RepositorySystemSession session) {
 
     final TakariTargetPlatform targetPlatform =
-        targetPlatformProvider.getProjectTargetPlatform(project);
+        targetPlatformProvider.getTargetPlatform(project);
     if (targetPlatform == null) {
       return null;
     }

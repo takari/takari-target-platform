@@ -42,15 +42,10 @@ public class TakariTargetPlatformProvider implements TargetPlatformProvider {
   }
 
   @Override
-  public TakariTargetPlatform getProjectTargetPlatform(MavenProject project) {
+  public TakariTargetPlatform getTargetPlatform(MavenProject project) {
     if (isDisabled(project.getProperties())) {
       return null;
     }
-    return targetPlatform;
-  }
-
-  @Override
-  public TakariTargetPlatform getSessionTargetPlatform() {
     return targetPlatform;
   }
 

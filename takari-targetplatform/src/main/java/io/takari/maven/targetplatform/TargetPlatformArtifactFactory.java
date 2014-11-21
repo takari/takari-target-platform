@@ -1,0 +1,128 @@
+package io.takari.maven.targetplatform;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.eclipse.aether.version.Version;
+
+import com.google.inject.AbstractModule;
+
+@SuppressWarnings("deprecation")
+public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
+
+  @Named
+  public static class Module extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(ProjectArtifactFactory.class).to(TargetPlatformArtifactFactory.class);
+    }
+  }
+
+  private final ArtifactFactory factory;
+
+  private final Provider<TargetPlatformProvider> targetPlatformProvider;
+
+  @Inject
+  public TargetPlatformArtifactFactory(ArtifactFactory factory,
+      Provider<TargetPlatformProvider> targetPlatformProvider) {
+    this.factory = factory;
+    this.targetPlatformProvider = targetPlatformProvider;
+  }
+
+  @Override
+  public Set<Artifact> createArtifacts(MavenProject project)
+      throws InvalidDependencyVersionException {
+
+    TakariTargetPlatform targetPlatform = targetPlatformProvider.get().getTargetPlatform(project);
+
+    Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+    for (Dependency dependency : project.getDependencies()) {
+      Artifact artifact;
+      try {
+        artifact = createDependencyArtifact(targetPlatform, dependency);
+      } catch (InvalidVersionSpecificationException e) {
+        throw new InvalidDependencyVersionException(project.getId(), dependency, project.getFile(),
+            e);
+      }
+      artifacts.add(artifact);
+    }
+    return artifacts;
+  }
+
+  // adopted from org.apache.maven.project.artifact.MavenMetadataSource#createDependencyArtifact
+  private Artifact createDependencyArtifact(TakariTargetPlatform targetPlatform,
+      Dependency dependency) throws InvalidVersionSpecificationException {
+    String effectiveScope = dependency.getScope();
+    if (effectiveScope == null) {
+      effectiveScope = Artifact.SCOPE_COMPILE;
+    }
+
+    String version = dependency.getVersion();
+
+    if (version != null) {
+      throw new InvalidVersionSpecificationException("Dependency version is not allowed");
+    }
+
+    Collection<Version> versions =
+        targetPlatform.getVersions(dependency.getGroupId(), dependency.getArtifactId());
+
+    if (versions.size() != 1) {
+      throw new InvalidVersionSpecificationException("Cannot inject version: " + versions);
+    }
+
+    version = versions.iterator().next().toString();
+
+    VersionRange effectiveVersion = VersionRange.createFromVersionSpec(version);
+
+    Artifact artifact = factory.createDependencyArtifact( //
+        dependency.getGroupId(), //
+        dependency.getArtifactId(), //
+        effectiveVersion, //
+        dependency.getType(), //
+        dependency.getClassifier(), //
+        effectiveScope, //
+        dependency.isOptional());
+
+    if (Artifact.SCOPE_SYSTEM.equals(effectiveScope)) {
+      artifact.setFile(new File(dependency.getSystemPath()));
+    }
+
+    artifact.setDependencyFilter(createDependencyFilter(dependency));
+
+    return artifact;
+  }
+
+
+  // adopted from org.apache.maven.project.artifact.MavenMetadataSource#createDependencyFilter
+  private ArtifactFilter createDependencyFilter(Dependency dependency) {
+    ArtifactFilter effectiveFilter = null;
+    if (!dependency.getExclusions().isEmpty()) {
+      List<String> exclusions = new ArrayList<String>();
+      for (Exclusion e : dependency.getExclusions()) {
+        exclusions.add(e.getGroupId() + ':' + e.getArtifactId());
+      }
+      effectiveFilter = new ExcludesArtifactFilter(exclusions);
+    }
+    return effectiveFilter;
+  }
+
+}
