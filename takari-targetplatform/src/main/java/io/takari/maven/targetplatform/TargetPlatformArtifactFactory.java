@@ -17,6 +17,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.lifecycle.internal.DefaultProjectArtifactFactory;
 import org.apache.maven.lifecycle.internal.ProjectArtifactFactory;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -43,13 +44,16 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
 
   private final Provider<ReactorProjects> reactorProjects;
 
+  private final DefaultProjectArtifactFactory delegate;
+
   @Inject
   public TargetPlatformArtifactFactory(ArtifactFactory factory,
       Provider<TargetPlatformProvider> targetPlatformProvider,
-      Provider<ReactorProjects> reactorProjects) {
+      Provider<ReactorProjects> reactorProjects, DefaultProjectArtifactFactory delegate) {
     this.factory = factory;
     this.targetPlatformProvider = targetPlatformProvider;
     this.reactorProjects = reactorProjects;
+    this.delegate = delegate;
   }
 
   @Override
@@ -57,6 +61,11 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
       throws InvalidDependencyVersionException {
 
     TakariTargetPlatform targetPlatform = targetPlatformProvider.get().getTargetPlatform(project);
+
+    if (targetPlatform == null) {
+      return delegate.createArtifacts(project);
+    }
+
     ReactorProjects reactorProjects = this.reactorProjects.get();
 
     Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
