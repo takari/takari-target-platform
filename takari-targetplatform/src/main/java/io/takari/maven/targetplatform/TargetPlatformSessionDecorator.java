@@ -1,6 +1,7 @@
 package io.takari.maven.targetplatform;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -96,13 +97,35 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
           public boolean visitEnter(DependencyNode node) {
             Dependency dependency = node.getDependency();
             trail.push(dependency);
-            if (dependency != null && !JavaScopes.SYSTEM.equals(dependency.getScope())) {
-              Artifact artifact = node.getArtifact();
-              if (!reactorProjects.isReactorProject(artifact.getGroupId(),
-                  artifact.getArtifactId(), artifact.getVersion())
-                  && !targetPlatform.includes(artifact)) {
-                blocked.add(new ArrayList<>(trail));
+
+            if (dependency == null || JavaScopes.SYSTEM.equals(dependency.getScope())) {
+              return true;
+            }
+
+            Artifact artifact = node.getArtifact();
+            String groupId = artifact.getGroupId();
+            String artifactId = artifact.getArtifactId();
+
+            if (reactorProjects.isReactorProject(groupId, artifactId, artifact.getVersion())) {
+              return true;
+            }
+
+            if (targetPlatform.includes(artifact)) {
+              return true;
+            }
+
+            Version version = reactorProjects.getReactorVersion(groupId, artifactId);
+            if (version == null) {
+              Collection<Version> versions = targetPlatform.getVersions(groupId, artifactId);
+              if (versions.size() == 1) {
+                version = versions.iterator().next();
               }
+            }
+
+            if (version != null) {
+              node.setArtifact(artifact.setVersion(version.toString()));
+            } else {
+              blocked.add(new ArrayList<>(trail));
             }
             return true;
           }
@@ -158,7 +181,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
     filtered.setVersionFilter(ChainedVersionFilter.newInstance(filtered.getVersionFilter(),
         versionFilter));
     filtered.setDependencyGraphTransformer(ChainedDependencyGraphTransformer.newInstance(
-        filtered.getDependencyGraphTransformer(), transformer));
+        transformer, filtered.getDependencyGraphTransformer()));
     filtered.setDependencyTraverser(AndDependencyTraverser.newInstance(
         filtered.getDependencyTraverser(), traverser));
 

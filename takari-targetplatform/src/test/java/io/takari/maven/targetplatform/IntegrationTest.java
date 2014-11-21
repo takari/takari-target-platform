@@ -90,6 +90,14 @@ public class IntegrationTest {
     result.assertLogText("org.hamcrest:hamcrest-core:jar:1.2.1:compile");
   }
 
+  @Test
+  public void testTransitiveDependencyAmbiguous() throws Exception {
+    File basedir = resources.getBasedir("transitive-dependency-ambiguous");
+
+    MavenExecutionResult result = maven.forProject(basedir).execute("clean", "compile");
+
+    result.assertLogText("<blocked> org.hamcrest:hamcrest-core:jar:1.3");
+  }
 
   @Test
   public void testSystemScope() throws Exception {
