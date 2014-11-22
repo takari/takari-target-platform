@@ -22,15 +22,21 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class TakariTargetPlatformProvider implements TargetPlatformProvider {
 
   /**
+   * Maven project property that controls build target platform strictness.
+   * <p>
    * In strict mode (the default), the build target platform artifact versions are enforced for all
    * project direct and indirect dependencies. All project direct dependencies must be versionless.
    * <p>
    * In non-strict mode, the build target platform will only apply to versionless project
-   * dependencies. Otherwise, normal Maven dependency resolution rules apply. This was originally
+   * dependencies. Otherwise, normal Maven dependency resolution rules apply. This mode was
    * introduced to support projects that build and execute maven plugins during the same reactor
-   * build, but might be useful in other scenarios.
+   * build.
+   * <p>
+   * The property can be defined in the project itself or inherited from parent pom.
    */
   public static final String PROP_STRICT = "takari.targetplatform.strict";
+
+  public static final String PROP_TARGET_PLATFORM = "TAKARI_TARGET_PLATFORM";
 
   private final TakariTargetPlatform targetPlatform;
 
@@ -38,11 +44,18 @@ public class TakariTargetPlatformProvider implements TargetPlatformProvider {
   public TakariTargetPlatformProvider(MavenSession session) throws IOException,
       XmlPullParserException {
     TakariTargetPlatform targetPlatform = null;
-    File file = new File(session.getRequest().getBaseDirectory(), "target-platform.xml");
-    if (file.isFile() && file.canRead()) {
-      try (InputStream is = new FileInputStream(file)) {
-        TargetPlatformModel model = new TargetPlatformModelXpp3Reader().read(is);
-        targetPlatform = new TakariTargetPlatform(model);
+
+    targetPlatform =
+        (TakariTargetPlatform) session.getRepositorySession().getConfigProperties()
+            .get(PROP_TARGET_PLATFORM);
+
+    if (targetPlatform == null) {
+      File file = new File(session.getRequest().getBaseDirectory(), "target-platform.xml");
+      if (file.isFile() && file.canRead()) {
+        try (InputStream is = new FileInputStream(file)) {
+          TargetPlatformModel model = new TargetPlatformModelXpp3Reader().read(is);
+          targetPlatform = new TakariTargetPlatform(model);
+        }
       }
     }
     this.targetPlatform = targetPlatform;

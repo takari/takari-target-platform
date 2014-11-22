@@ -87,8 +87,10 @@ public class FilteredArtifactResolver implements ArtifactResolver {
 
   private List<ArtifactResult> validate(RepositorySystemSession session,
       List<ArtifactResult> results) throws ArtifactResolutionException {
+
     TakariTargetPlatform targetPlatform =
-        (TakariTargetPlatform) session.getData().get(TakariTargetPlatform.class);
+        (TakariTargetPlatform) session.getConfigProperties().get(
+            TakariTargetPlatformProvider.PROP_TARGET_PLATFORM);
 
     if (targetPlatform != null) {
       List<ArtifactResult> blocked = new ArrayList<>();

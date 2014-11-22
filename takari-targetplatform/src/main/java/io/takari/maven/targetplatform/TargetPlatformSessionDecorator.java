@@ -8,7 +8,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.RepositorySessionDecorator;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.SessionData;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.collection.VersionFilter;
@@ -55,33 +54,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
     filtered.setDependencyTraverser(AndDependencyTraverser.newInstance(
         filtered.getDependencyTraverser(), traverser));
 
-    // workaround lack of session data scoping
-    final SessionData data = session.getData();
-    filtered.setData(new SessionData() {
-      @Override
-      public boolean set(Object key, Object oldValue, Object newValue) {
-        if (TakariTargetPlatform.class == key) {
-          throw new IllegalArgumentException();
-        }
-        return data.set(key, oldValue, newValue);
-      }
-
-      @Override
-      public void set(Object key, Object value) {
-        if (TakariTargetPlatform.class == key) {
-          throw new IllegalArgumentException();
-        }
-        data.set(key, value);
-      }
-
-      @Override
-      public Object get(Object key) {
-        if (TakariTargetPlatform.class == key) {
-          return targetPlatform;
-        }
-        return data.get(key);
-      }
-    });
+    filtered.setConfigProperty(TakariTargetPlatformProvider.PROP_TARGET_PLATFORM, targetPlatform);
 
     return filtered;
   }
