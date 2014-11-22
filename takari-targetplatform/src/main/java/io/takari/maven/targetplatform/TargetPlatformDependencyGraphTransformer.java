@@ -21,13 +21,20 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
   private final ReactorProjects reactorProjects;
   private final TakariTargetPlatform targetPlatform;
   private final MavenProject project;
+  private final boolean linient;
 
 
   public TargetPlatformDependencyGraphTransformer(ReactorProjects reactorProjects,
       TakariTargetPlatform targetPlatform, MavenProject project) {
+    this(reactorProjects, targetPlatform, project, false);
+  }
+
+  public TargetPlatformDependencyGraphTransformer(ReactorProjects reactorProjects,
+      TakariTargetPlatform targetPlatform, MavenProject project, boolean linient) {
     this.reactorProjects = reactorProjects;
     this.targetPlatform = targetPlatform;
     this.project = project;
+    this.linient = linient;
   }
 
   @Override
@@ -81,7 +88,7 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
       }
     });
 
-    if (!blocked.isEmpty()) {
+    if (!linient && !blocked.isEmpty()) {
       StringBuilder message =
           new StringBuilder("Artifacts are not part of the project build target platform:");
       for (int blockedIdx = 0; blockedIdx < blocked.size(); blockedIdx++) {
