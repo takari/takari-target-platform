@@ -2,7 +2,9 @@ package io.takari.maven.targetplatform;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.maven.project.MavenProject;
@@ -42,6 +44,7 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
       DependencyGraphTransformationContext context) throws RepositoryException {
     final List<List<Dependency>> blocked = new ArrayList<>();
     node.accept(new DependencyVisitor() {
+      final Set<DependencyNode> visited = new HashSet<>();
       final Stack<Dependency> trail = new Stack<>();
 
       @Override
@@ -52,11 +55,19 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
 
       @Override
       public boolean visitEnter(DependencyNode node) {
+        trail.push(node.getDependency());
+        if (!visited.add(node)) {
+          return false; // dependency cycle? do not recurse into children then.
+        }
+        process(node);
+        return true;
+      }
+
+      private void process(DependencyNode node) {
         Dependency dependency = node.getDependency();
-        trail.push(dependency);
 
         if (dependency == null || JavaScopes.SYSTEM.equals(dependency.getScope())) {
-          return true;
+          return;
         }
 
         Artifact artifact = node.getArtifact();
@@ -64,11 +75,11 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
         String artifactId = artifact.getArtifactId();
 
         if (reactorProjects.isReactorProject(groupId, artifactId, artifact.getVersion())) {
-          return true;
+          return;
         }
 
         if (targetPlatform.includes(artifact)) {
-          return true;
+          return;
         }
 
         Version version = reactorProjects.getReactorVersion(groupId, artifactId);
@@ -84,7 +95,6 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
         } else {
           blocked.add(new ArrayList<>(trail));
         }
-        return true;
       }
     });
 
