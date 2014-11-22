@@ -2,7 +2,6 @@ package io.takari.maven.targetplatform;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +21,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.eclipse.aether.version.Version;
 
 import com.google.inject.AbstractModule;
 
@@ -62,11 +60,14 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
 
     ReactorProjects reactorProjects = this.reactorProjects.get();
 
+    DependencyVersionProvider context =
+        new DependencyVersionProvider(targetPlatform, reactorProjects, strict);
+
     Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
     for (Dependency dependency : project.getDependencies()) {
       Artifact artifact;
       try {
-        artifact = createDependencyArtifact(targetPlatform, reactorProjects, strict, dependency);
+        artifact = createDependencyArtifact(context, dependency);
       } catch (InvalidVersionSpecificationException e) {
         throw new InvalidDependencyVersionException(project.getId(), dependency, project.getFile(),
             e);
@@ -77,8 +78,7 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
   }
 
   // adopted from org.apache.maven.project.artifact.MavenMetadataSource#createDependencyArtifact
-  private Artifact createDependencyArtifact(TakariTargetPlatform targetPlatform,
-      ReactorProjects reactorProjects, boolean strict, Dependency dependency)
+  private Artifact createDependencyArtifact(DependencyVersionProvider context, Dependency dependency)
       throws InvalidVersionSpecificationException {
 
     final String groupId = dependency.getGroupId();
@@ -89,27 +89,7 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
       effectiveScope = Artifact.SCOPE_COMPILE;
     }
 
-    VersionRange version;
-
-    String dependencyVersion = dependency.getVersion();
-    if (targetPlatform == null) {
-      // this is a legacy project, target platform rules do not apply
-      version = VersionRange.createFromVersionSpec(dependencyVersion);
-    } else if (Artifact.SCOPE_SYSTEM.equals(effectiveScope)) {
-      // target platform does not manage system-scoped dependencies
-      version = VersionRange.createFromVersionSpec(dependencyVersion);
-    } else if (!strict && dependencyVersion != null) {
-      // in non-strict mode, use provided dependency versions
-      version = VersionRange.createFromVersionSpec(dependencyVersion);
-    } else {
-      if (dependencyVersion != null) {
-        throw new InvalidVersionSpecificationException("Dependency version is not allowed");
-      }
-      version = getReactorVersion(reactorProjects, groupId, artifactId);
-      if (version == null) {
-        version = getTargetPlatformVersion(targetPlatform, groupId, artifactId);
-      }
-    }
+    VersionRange version = VersionRange.createFromVersionSpec(context.getVersion(dependency));
 
     Artifact artifact = factory.createDependencyArtifact( //
         groupId, //
@@ -128,29 +108,6 @@ public class TargetPlatformArtifactFactory implements ProjectArtifactFactory {
 
     return artifact;
   }
-
-  private VersionRange getTargetPlatformVersion(TakariTargetPlatform targetPlatform,
-      final String groupId, final String artifactId) throws InvalidVersionSpecificationException {
-    Collection<Version> versions = targetPlatform.getVersions(groupId, artifactId);
-    if (versions.isEmpty()) {
-      throw new InvalidVersionSpecificationException(
-          "Artifact is not part of the build target platform: " + groupId + ":" + artifactId);
-    }
-    if (versions.size() > 1) {
-      throw new InvalidVersionSpecificationException(
-          "Ambiguous build target platform artifact version: " + groupId + ":" + artifactId + ":"
-              + versions);
-    }
-    Version version = versions.iterator().next();
-    return VersionRange.createFromVersionSpec(version.toString());
-  }
-
-  private VersionRange getReactorVersion(ReactorProjects reactorProjects, final String groupId,
-      final String artifactId) throws InvalidVersionSpecificationException {
-    Version version = reactorProjects.getReactorVersion(groupId, artifactId);
-    return version != null ? VersionRange.createFromVersionSpec(version.toString()) : null;
-  }
-
 
   // adopted from org.apache.maven.project.artifact.MavenMetadataSource#createDependencyFilter
   private ArtifactFilter createDependencyFilter(Dependency dependency) {
