@@ -177,4 +177,8 @@ public class TakariTargetPlatform {
   private static <T> boolean eq(T a, T b) {
     return a != null ? a.equals(b) : b == null;
   }
+
+  public boolean isEmpty() {
+    return artifacts.isEmpty();
+  }
 }

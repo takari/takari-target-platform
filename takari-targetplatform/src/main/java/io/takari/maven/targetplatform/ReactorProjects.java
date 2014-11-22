@@ -1,5 +1,6 @@
 package io.takari.maven.targetplatform;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +27,12 @@ public class ReactorProjects {
 
   @Inject
   public ReactorProjects(MavenSession session) {
+    this(session.getProjectMap().values());
+  }
+
+  public ReactorProjects(Collection<MavenProject> projects) {
     Map<String, Version> reactorProjects = new HashMap<>();
-    for (MavenProject project : session.getProjectMap().values()) {
+    for (MavenProject project : projects) {
       try {
         String key = keyGA(project.getGroupId(), project.getArtifactId());
         Version version = versionScheme.parseVersion(project.getVersion());
