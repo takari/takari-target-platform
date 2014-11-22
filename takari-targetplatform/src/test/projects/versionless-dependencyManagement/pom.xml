@@ -8,7 +8,8 @@
   <!--
     | Standard Maven behaviour is to require <version> elements in 
     | dependencyManagement section. This test verifies versionless
-    | managed dependencies are allowed.  
+    | managed dependencies are allowed and correctly merged to the
+    | corresponding dependencies.
    -->
 
   <dependencies>
@@ -23,16 +24,6 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <exclusions>
-          <exclusion>
-            <groupId>*</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
         <exclusions>
           <exclusion>
             <groupId>*</groupId>
