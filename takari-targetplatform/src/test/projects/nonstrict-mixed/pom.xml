@@ -12,9 +12,11 @@
     |
     |     module-a -> junit
     |             \-> module-b -> junit
+    |                         \-> module-c
     |
     | target platform support is nonstrict for module-a, strict for module-b
-    | module-a is still supposed to get junit version from the target platform.
+    | and module-c.
+    | module-a is supposed to get junit version from the target platform.
     |
     | This is an edge case and such mixed projects may not be supported in the
     | future.
@@ -23,5 +25,6 @@
   <modules>
     <module>module-a</module>
     <module>module-b</module>
+    <module>module-c</module>
   </modules>
 </project>

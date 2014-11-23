@@ -10,5 +10,9 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.takari.maven.targetplatform.tests</groupId>
+      <artifactId>nonstrict-mixed-module-c</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -8,9 +8,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.RepositorySessionDecorator;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.collection.DependencyGraphTransformer;
-import org.eclipse.aether.collection.DependencyTraverser;
-import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.traverser.AndDependencyTraverser;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
@@ -35,26 +32,28 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
       final RepositorySystemSession session) {
 
     final TakariTargetPlatform targetPlatform = targetPlatformProvider.getTargetPlatform(project);
-    if (targetPlatform == null || !targetPlatformProvider.isStrict(project)) {
+    if (targetPlatform == null) {
       return null;
     }
 
-    final VersionFilter versionFilter =
-        new TargetPlatformVersionFilter(reactorProjects, targetPlatform);
-    final DependencyGraphTransformer transformer =
-        new TargetPlatformDependencyGraphTransformer(reactorProjects, targetPlatform, project);
-    final DependencyTraverser traverser =
-        new TargetPlatformDependencyTraverser(reactorProjects, targetPlatform);
+    final boolean strict = targetPlatformProvider.isStrict(project);
+
     final DefaultRepositorySystemSession filtered = new DefaultRepositorySystemSession(session);
 
-    filtered.setVersionFilter(ChainedVersionFilter.newInstance(filtered.getVersionFilter(),
-        versionFilter));
     filtered.setDependencyGraphTransformer(ChainedDependencyGraphTransformer.newInstance(
-        transformer, filtered.getDependencyGraphTransformer()));
-    filtered.setDependencyTraverser(AndDependencyTraverser.newInstance(
-        filtered.getDependencyTraverser(), traverser));
+        new TargetPlatformDependencyGraphTransformer(reactorProjects, targetPlatform, project,
+            strict), filtered.getDependencyGraphTransformer()));
 
-    filtered.setConfigProperty(TakariTargetPlatformProvider.PROP_TARGET_PLATFORM, targetPlatform);
+    if (strict) {
+      filtered.setVersionFilter(ChainedVersionFilter.newInstance(filtered.getVersionFilter(),
+          new TargetPlatformVersionFilter(reactorProjects, targetPlatform)));
+      filtered.setDependencyTraverser(AndDependencyTraverser.newInstance(filtered
+          .getDependencyTraverser(), new TargetPlatformDependencyTraverser(reactorProjects,
+          targetPlatform)));
+
+      // ain't pretty, but this is how target platform is passed to FilteredArtifactResolver
+      filtered.setConfigProperty(TakariTargetPlatformProvider.PROP_TARGET_PLATFORM, targetPlatform);
+    }
 
     return filtered;
   }
