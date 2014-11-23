@@ -6,6 +6,7 @@ import io.takari.maven.targetplatform.model.TargetPlatformModel;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,8 +18,8 @@ import org.eclipse.aether.version.VersionRange;
 import org.eclipse.aether.version.VersionScheme;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 public class TakariTargetPlatform {
 
@@ -63,8 +64,8 @@ public class TakariTargetPlatform {
       }
     }
 
-    this.artifacts = Multimaps.unmodifiableMultimap(artifacts);
-    this.versions = Multimaps.unmodifiableMultimap(versions);
+    this.artifacts = ImmutableMultimap.copyOf(artifacts);
+    this.versions = ImmutableMultimap.copyOf(versions);
   }
 
   public boolean includes(Artifact artifact) {
@@ -91,9 +92,8 @@ public class TakariTargetPlatform {
   private Collection<Version> getVersions(Artifact artifact) {
     Collection<ArtifactInfo> infos = artifacts.get(keyArtifact(artifact));
 
-    // hack to support project-project dependencies, remove
     if (infos.isEmpty()) {
-      infos = artifacts.get(keyArtifactProject(artifact));
+      return Collections.emptySet();
     }
 
     Set<Version> versions = new HashSet<>();
@@ -141,10 +141,6 @@ public class TakariTargetPlatform {
   private static String keyArtifact(Artifact artifact) {
     return key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(),
         artifact.getExtension());
-  }
-
-  private static String keyArtifactProject(Artifact artifact) {
-    return key(artifact.getGroupId(), artifact.getArtifactId(), "*", "*");
   }
 
   private static String keyGA(String groupId, String artifactId) {
