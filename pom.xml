@@ -16,6 +16,10 @@
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
   </properties>
 
+  <modules>
+    <module>takari-targetplatform</module>
+  </modules>
+
   <build>
     <plugins>
       <plugin>
