@@ -4,6 +4,7 @@ import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import io.takari.maven.testing.executor.MavenRuntime.MavenRuntimeBuilder;
+import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
 
 import java.io.File;
@@ -15,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
 @RunWith(MavenJUnitTestRunner.class)
+@MavenVersions({"3.2.4-SNAPSHOT"})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTest {
 
