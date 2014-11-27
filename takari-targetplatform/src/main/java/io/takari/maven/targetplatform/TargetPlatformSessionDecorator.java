@@ -42,7 +42,7 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
 
     filtered.setDependencyGraphTransformer(ChainedDependencyGraphTransformer.newInstance(
         new TargetPlatformDependencyGraphTransformer(reactorProjects, targetPlatform, project,
-            strict), filtered.getDependencyGraphTransformer()));
+            strict, strict), filtered.getDependencyGraphTransformer()));
 
     if (strict) {
       filtered.setVersionFilter(ChainedVersionFilter.newInstance(filtered.getVersionFilter(),
