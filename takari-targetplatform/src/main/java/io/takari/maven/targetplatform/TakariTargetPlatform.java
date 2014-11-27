@@ -7,8 +7,8 @@ import io.takari.maven.targetplatform.model.TargetPlatformModel;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.util.version.GenericVersionScheme;
@@ -69,18 +69,19 @@ public class TakariTargetPlatform {
   }
 
   public boolean includes(Artifact artifact) {
-    Collection<Version> versions = getVersions(artifact);
+    Map<Version, Version> versions = getVersions(artifact);
 
     if (versions.isEmpty()) {
       return false;
     }
 
-    String version = artifact.getVersion();
+    String artifactVersion = artifact.getVersion();
     try {
-      return contains(versionScheme.parseVersionRange(version), versions);
+      return contains(versionScheme.parseVersionRange(artifactVersion), versions.keySet());
     } catch (InvalidVersionSpecificationException e) {
       try {
-        return versions.contains(versionScheme.parseVersion(version));
+        Version version = versions.get(versionScheme.parseVersion(artifactVersion));
+        return version != null && version.toString().equals(artifactVersion);
       } catch (InvalidVersionSpecificationException e1) {
         // generic versioning scheme allows any version string, this exception is never thrown
       }
@@ -89,16 +90,16 @@ public class TakariTargetPlatform {
     return false;
   }
 
-  private Collection<Version> getVersions(Artifact artifact) {
+  private Map<Version, Version> getVersions(Artifact artifact) {
     Collection<ArtifactInfo> infos = artifacts.get(keyArtifact(artifact));
 
     if (infos.isEmpty()) {
-      return Collections.emptySet();
+      return Collections.emptyMap();
     }
 
-    Set<Version> versions = new HashSet<>();
+    Map<Version, Version> versions = new HashMap<>();
     for (ArtifactInfo info : infos) {
-      versions.add(info.version);
+      versions.put(info.version, info.version);
     }
 
     return versions;
@@ -117,14 +118,16 @@ public class TakariTargetPlatform {
     return false;
   }
 
-  public boolean includes(Artifact artifact, Version version) {
-    Collection<Version> versions = getVersions(artifact);
+  public boolean includes(Artifact artifact, Version artifactVersion) {
+    Map<Version, Version> versions = getVersions(artifact);
 
     if (versions.isEmpty()) {
       return false;
     }
 
-    return versions.contains(version);
+    Version version = versions.get(artifactVersion);
+
+    return version != null && version.toString().equals(artifactVersion.toString());
   }
 
   private static String key(String groupId, String artifactId, String classifier, String extension) {
