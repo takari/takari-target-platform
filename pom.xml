@@ -24,6 +24,7 @@
 
   <modules>
     <module>takari-targetplatform</module>
+    <module>takari-targetplatform-plugin</module>
   </modules>
 
   <build>
@@ -87,6 +88,21 @@
                   </pluginExecutionFilter>
                   <action>
                     <ignore></ignore>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[2.9,)</versionRange>
+                    <goals>
+                      <goal>properties</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>true</runOnIncremental>
+                    </execute>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
