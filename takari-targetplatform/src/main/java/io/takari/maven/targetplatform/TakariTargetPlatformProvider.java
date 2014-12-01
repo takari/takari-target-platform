@@ -54,7 +54,7 @@ public class TakariTargetPlatformProvider implements TargetPlatformProvider {
       if (file.isFile() && file.canRead()) {
         try (InputStream is = new FileInputStream(file)) {
           TargetPlatformModel model = new TargetPlatformModelXpp3Reader().read(is);
-          targetPlatform = new TakariTargetPlatform(model);
+          targetPlatform = TakariTargetPlatform.builder().setArtifacts(model).build();
         }
       }
     }

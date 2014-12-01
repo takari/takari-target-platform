@@ -45,25 +45,8 @@ public class TakariTargetPlatform {
   // g:a => { Version }
   private final Multimap<String, Version> versions;
 
-  public TakariTargetPlatform(TargetPlatformModel model) {
-    final Multimap<String, ArtifactInfo> artifacts = HashMultimap.create();
-    final Multimap<String, Version> versions = HashMultimap.create();
-
-    for (TargetPlatformGAV gav : model.getGavs()) {
-      try {
-        Version version = versionScheme.parseVersion(gav.getVersion());
-        versions.put(keyGA(gav.getGroupId(), gav.getArtifactId()), version);
-        for (TargetPlatformArtifact artifact : gav.getArtifacts()) {
-          String key = versionlessKey(gav, artifact);
-          String classifier = artifact.getClassifier() != null ? artifact.getClassifier() : "";
-          artifacts.put(key, new ArtifactInfo(classifier, artifact.getExtension(), version,
-              artifact.getSHA1()));
-        }
-      } catch (InvalidVersionSpecificationException e) {
-        // ignore, can't happen
-      }
-    }
-
+  private TakariTargetPlatform(Multimap<String, ArtifactInfo> artifacts,
+      Multimap<String, Version> versions) {
     this.artifacts = ImmutableMultimap.copyOf(artifacts);
     this.versions = ImmutableMultimap.copyOf(versions);
   }
@@ -146,15 +129,15 @@ public class TakariTargetPlatform {
         artifact.getExtension());
   }
 
+  private static String keyArtifact(String groupId, String artifactId, String classifier,
+      String extension) {
+    return key(groupId, artifactId, classifier, extension != null ? extension : "jar");
+  }
+
   private static String keyGA(String groupId, String artifactId) {
     return groupId + ":" + artifactId;
   }
 
-  private static String versionlessKey(TargetPlatformGAV gav, TargetPlatformArtifact artifact) {
-    String extension = artifact.getExtension();
-    return key(gav.getGroupId(), gav.getArtifactId(), artifact.getClassifier(),
-        extension != null ? extension : "jar");
-  }
 
   public String getSHA1(Artifact artifact) throws IOException {
     for (ArtifactInfo info : artifacts.get(keyArtifact(artifact))) {
@@ -179,5 +162,57 @@ public class TakariTargetPlatform {
 
   public boolean isEmpty() {
     return artifacts.isEmpty();
+  }
+
+  public static class Builder {
+    final Multimap<String, ArtifactInfo> artifacts = HashMultimap.create();
+    final Multimap<String, Version> versions = HashMultimap.create();
+
+    public TakariTargetPlatform build() {
+      return new TakariTargetPlatform(artifacts, versions);
+    }
+
+    public Builder setArtifacts(TargetPlatformModel model) {
+      this.artifacts.clear();
+      this.versions.clear();
+
+      for (TargetPlatformGAV gav : model.getGavs()) {
+        for (TargetPlatformArtifact artifact : gav.getArtifacts()) {
+          addArtifact(gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+              artifact.getClassifier(), artifact.getExtension(), artifact.getSHA1());
+        }
+      }
+
+      return this;
+    }
+
+    public Builder addArtifact(String groupId, String artifactId, String versionStr,
+        String classifier, String extension, String sha1) {
+
+      if (classifier == null) {
+        classifier = "";  // this is how aether likes it.
+      }
+
+      try {
+        Version version = versionScheme.parseVersion(versionStr);
+        String keyGA = keyGA(groupId, artifactId);
+        String keyArtifact = keyArtifact(groupId, artifactId, classifier, extension);
+        versions.put(keyGA, version);
+        ArtifactInfo info = new ArtifactInfo(classifier, extension, version, sha1);
+        artifacts.put(keyArtifact, info);
+      } catch (InvalidVersionSpecificationException e) {
+        // can't happen with generic versioning scheme
+      }
+
+      return this;
+    }
+
+    public boolean isEmpty() {
+      return artifacts.isEmpty();
+    }
+  }
+
+  public static Builder builder() {
+    return new Builder();
   }
 }

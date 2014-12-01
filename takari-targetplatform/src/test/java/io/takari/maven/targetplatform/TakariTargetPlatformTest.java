@@ -18,7 +18,7 @@ public class TakariTargetPlatformTest {
     TargetPlatformModel model = new TargetPlatformModel();
     model.addGav(modelGav("g", "a", "1.2.3.test"));
 
-    TakariTargetPlatform tp = new TakariTargetPlatform(model);
+    TakariTargetPlatform tp = TakariTargetPlatform.builder().setArtifacts(model).build();
 
     Assert.assertTrue(tp.includes(new DefaultArtifact("g:a:1.2.3.test")));
     Assert.assertFalse(tp.includes(new DefaultArtifact("g:a:1.2.3-test")));
