@@ -97,6 +97,13 @@ public class IntegrationTest {
   }
 
   @Test
+  public void testImportScope() throws Exception {
+    File basedir = resources.getBasedir("importscope");
+
+    maven.forProject(basedir).execute("clean", "compile").assertErrorFreeLog();
+  }
+
+  @Test
   public void testChecksumPom() throws Exception {
     File basedir = resources.getBasedir("checksum-pom");
 
@@ -183,5 +190,25 @@ public class IntegrationTest {
         .execute("clean", "compile");
 
     result.assertErrorFreeLog();
+  }
+
+  @Test
+  public void testEnforceVersionlessDependency() throws Exception {
+    File basedir = resources.getBasedir("enforce-versionless-dependency");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertLogText("Dependency version is not allowed");
+  }
+
+  @Test
+  public void testEnforceVersionlessDependencyManagement() throws Exception {
+    File basedir = resources.getBasedir("enforce-versionless-dependencyManagement");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("clean", "compile");
+
+    result.assertLogText("Dependency version is not allowed");
   }
 }

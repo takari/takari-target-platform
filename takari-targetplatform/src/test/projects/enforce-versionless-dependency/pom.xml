@@ -2,20 +2,19 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>legacy</artifactId>
-  <version>0.1</version>
+  <artifactId>enforce-versionless-dependency</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
 
   <!--
-    | Smoke-test to make sure we don't do anything silly for "legacy" projects,
-    | i.e. projects without target platform. 
+    | The point of this test is to make sure dependency <version> 
+    | specification is not allowed for regular dependencies 
    -->
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.2</version>
+      <version>3.8.1</version>
     </dependency>
   </dependencies>
-
 </project>
