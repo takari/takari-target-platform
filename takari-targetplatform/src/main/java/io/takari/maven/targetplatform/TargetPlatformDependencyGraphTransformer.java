@@ -27,12 +27,12 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
   private final boolean blockDependencies;
 
   public TargetPlatformDependencyGraphTransformer(ReactorProjects reactorProjects,
-      TakariTargetPlatform targetPlatform, MavenProject project, boolean strict,
+      TakariTargetPlatform targetPlatform, MavenProject project, boolean strictVersion,
       boolean blockDependencies) {
     this.reactorProjects = reactorProjects;
     this.targetPlatform = targetPlatform;
     this.project = project;
-    this.strictVersions = strict;
+    this.strictVersions = strictVersion;
     this.blockDependencies = blockDependencies;
   }
 
