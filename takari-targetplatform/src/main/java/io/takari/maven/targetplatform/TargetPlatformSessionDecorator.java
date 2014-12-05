@@ -51,6 +51,11 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
           .getDependencyTraverser(), new TargetPlatformDependencyTraverser(reactorProjects,
           targetPlatform)));
 
+      DependencyVersionProvider versionProvider =
+          new DependencyVersionProvider(targetPlatform, reactorProjects, strict);
+      filtered.setDependencyManager(new TargetPlatformDependencyManager(versionProvider, filtered
+          .getDependencyManager()));
+
       // ain't pretty, but this is how target platform is passed to FilteredArtifactResolver
       filtered.setConfigProperty(TakariTargetPlatformProvider.PROP_TARGET_PLATFORM, targetPlatform);
     }

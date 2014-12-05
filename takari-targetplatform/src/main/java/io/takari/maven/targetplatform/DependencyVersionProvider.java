@@ -24,12 +24,18 @@ public class DependencyVersionProvider {
     final String groupId = dependency.getGroupId();
     final String artifactId = dependency.getArtifactId();
     final String version = dependency.getVersion();
+    final String scope = dependency.getScope();
 
+    return getVersion(groupId, artifactId, version, scope);
+  }
+
+  public String getVersion(final String groupId, final String artifactId, final String version,
+      final String scope) throws InvalidVersionSpecificationException {
     String result;
     if (targetPlatform == null) {
       // this is a legacy project, target platform rules do not apply
       result = version;
-    } else if (Artifact.SCOPE_SYSTEM.equals(dependency.getScope())) {
+    } else if (Artifact.SCOPE_SYSTEM.equals(scope)) {
       // target platform does not manage system-scoped dependencies
       result = version;
     } else if (!strict && version != null) {
