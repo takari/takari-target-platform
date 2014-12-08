@@ -3,6 +3,7 @@ package io.takari.maven.targetplatform;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -15,6 +16,7 @@ import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.version.Version;
 
@@ -39,10 +41,10 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
   @Override
   public DependencyNode transformGraph(DependencyNode node,
       DependencyGraphTransformationContext context) throws RepositoryException {
-    final List<List<Dependency>> blocked = new ArrayList<>();
+    final List<List<DependencyNode>> blocked = new ArrayList<>();
     node.accept(new DependencyVisitor() {
       final Set<DependencyNode> visited = new HashSet<>();
-      final Stack<Dependency> trail = new Stack<>();
+      final Stack<DependencyNode> trail = new Stack<>();
 
       @Override
       public boolean visitLeave(DependencyNode node) {
@@ -52,7 +54,7 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
 
       @Override
       public boolean visitEnter(DependencyNode node) {
-        trail.push(node.getDependency());
+        trail.push(node);
         if (!visited.add(node)) {
           return false; // dependency cycle? do not recurse into children then.
         }
@@ -98,8 +100,10 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
     if (blockDependencies && !blocked.isEmpty()) {
       StringBuilder message =
           new StringBuilder("Artifacts are not part of the project build target platform:");
+
+      final Set<RemoteRepository> repositories = new LinkedHashSet<>();
       for (int blockedIdx = 0; blockedIdx < blocked.size(); blockedIdx++) {
-        List<Dependency> trail = blocked.get(blockedIdx);
+        List<DependencyNode> trail = blocked.get(blockedIdx);
 
         message.append("\n").append(blockedIdx).append(". ");
         message.append(trail.get(trail.size() - 1).getArtifact());
@@ -111,10 +115,17 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
             if (trailIdx == trail.size() - 1) {
               message.append(" <blocked> ");
             }
-            message.append(trail.get(trailIdx));
+            DependencyNode trailNode = trail.get(trailIdx);
+            message.append('\t').append(trailNode.getDependency());
+            repositories.addAll(trailNode.getRepositories());
           }
         }
         message.append("\n\n");
+      }
+
+      message.append("Remote repositories:\n");
+      for (RemoteRepository repository : repositories) {
+        message.append(repository.toString()).append('\n');
       }
       throw new RepositoryException(message.toString());
     }
