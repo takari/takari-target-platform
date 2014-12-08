@@ -116,7 +116,7 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
               message.append(" <blocked> ");
             }
             DependencyNode trailNode = trail.get(trailIdx);
-            message.append('\t').append(trailNode.getDependency());
+            message.append(trailNode.getDependency());
             repositories.addAll(trailNode.getRepositories());
           }
         }
@@ -125,7 +125,7 @@ public class TargetPlatformDependencyGraphTransformer implements DependencyGraph
 
       message.append("Remote repositories:\n");
       for (RemoteRepository repository : repositories) {
-        message.append(repository.toString()).append('\n');
+        message.append('\t').append(repository.toString()).append('\n');
       }
       throw new RepositoryException(message.toString());
     }
