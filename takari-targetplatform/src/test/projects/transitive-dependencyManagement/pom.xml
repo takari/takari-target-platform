@@ -1,0 +1,51 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>transitive-dependency-m3</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <!--
+    | For reasons I don't fully understand, aether treads dependencies 2+ levels removed
+    | differently. This test is meant to verify dependency management still applies for
+    | such dependencies.
+    |
+    |      project
+    |       \- m2
+    |           \- m2
+    |               \- junit
+    |
+    | junit dependency is managed in this project to exclude hamcrest dependency. The
+    | build fails if dependency management specified here does not apply to junit.
+   -->
+
+  <repositories>
+    <repository>
+      <id>local</id>
+      <url>file://${project.basedir}/repo</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.takari.maven.targetplatform.tests</groupId>
+      <artifactId>transitive-dependency-m2</artifactId>
+    </dependency>
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>

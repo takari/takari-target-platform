@@ -212,4 +212,15 @@ public class IntegrationTest {
 
     result.assertLogText("Dependency version is not allowed");
   }
+
+  @Test
+  public void testTransitive_dependencyManagement() throws Exception {
+    File basedir = resources.getBasedir("transitive-dependencyManagement");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("compile");
+
+    result.assertErrorFreeLog();
+  }
+
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<target-platform>
+  <gav g="io.takari.maven.targetplatform.tests" a="transitive-dependency-m1" v="0.1">
+    <artifact e="jar" sha1="91f2e8e50fba698775af5e3ec317e190c2941e7f" />
+    <artifact e="pom" sha1="504d768a092bb9446007291f41e06d410a6d1725" />
+  </gav>
+  <gav g="io.takari.maven.targetplatform.tests" a="transitive-dependency-m2" v="0.1">
+    <artifact e="jar" sha1="13a890a13c381323d76529b367165117ed9893b8" />
+    <artifact e="pom" sha1="ae5e8970113802a3dfd1371b9df8a9ba1797fc60" />
+  </gav>
+  <gav g="junit" a="junit" v="4.11">
+    <artifact e="jar" sha1="4e031bb61df09069aeb2bffb4019e7a5034a4ee0" />
+    <artifact e="pom" sha1="cddf7490ffe839978cf5d6c944c01f2a8cb70a49" />
+  </gav>
+</target-platform>

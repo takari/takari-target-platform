@@ -1,0 +1,23 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>transitive-dependency-m2</artifactId>
+  <version>0.1</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.takari.maven.targetplatform.tests</groupId>
+      <artifactId>transitive-dependency-m1</artifactId>
+      <version>0.1</version>
+    </dependency>
+  </dependencies>
+
+  <distributionManagement>
+    <repository>
+      <id>local</id>
+      <url>file://${project.basedir}/repo</url>
+    </repository>
+  </distributionManagement>
+
+</project>

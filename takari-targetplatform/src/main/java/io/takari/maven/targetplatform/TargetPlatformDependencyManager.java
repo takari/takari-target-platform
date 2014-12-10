@@ -48,7 +48,7 @@ public class TargetPlatformDependencyManager implements DependencyManager {
   public DependencyManager deriveChildManager(DependencyCollectionContext context) {
     DependencyManager childManager = delegate.deriveChildManager(context);
     return childManager != delegate ? new TargetPlatformDependencyManager(versionProvider,
-        childManager) : null;
+        childManager) : this;
   }
 
 }
