@@ -3,6 +3,7 @@ package io.takari.maven.targetplatform.plugins;
 import io.takari.maven.targetplatform.TargetPlatformProvider;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +13,9 @@ import javax.inject.Named;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.MavenProject;
 
 import de.pdark.decentxml.Document;
@@ -54,12 +58,12 @@ public class TargetPlatformPomProcessor implements PomProcessor {
 
   private final MavenProject project;
 
-//  private final TakariTargetPlatform targetPlatform;
+  // private final TakariTargetPlatform targetPlatform;
 
   @Inject
   public TargetPlatformPomProcessor(MavenProject project, TargetPlatformProvider targetPlatform) {
     this.project = project;
-//    this.targetPlatform = targetPlatform.getTargetPlatform(project);
+    // this.targetPlatform = targetPlatform.getTargetPlatform(project);
   }
 
   @Override
@@ -74,14 +78,25 @@ public class TargetPlatformPomProcessor implements PomProcessor {
         return true;
       }
     });
-    Set<Artifact> artifacts = project.getArtifacts();
+    final Set<Artifact> artifacts = project.getArtifacts();
+    final DependencyManagement dependencyManagement = project.getModel().getDependencyManagement();
 
     // g:a => v
-    Map<GA, String> injected = new HashMap<>();
+    final Map<GA, String> versions = new HashMap<>();
     for (Artifact dependency : artifacts) {
-      // note 'same instance' comparison
+      if (Artifact.SCOPE_SYSTEM.equals(dependency.getScope())) {
+        continue; // TODO test
+      }
       GA key = keyGA(dependency.getGroupId(), dependency.getArtifactId());
-      injected.put(key, dependency.getVersion());
+      versions.put(key, dependency.getVersion());
+    }
+
+    final Map<GA, Dependency> dependencies = new HashMap<>();
+    if (dependencyManagement != null) {
+      for (Dependency dependency : dependencyManagement.getDependencies()) {
+        GA key = keyGA(dependency.getGroupId(), dependency.getArtifactId());
+        dependencies.put(key, dependency);
+      }
     }
 
     Element x_dependencyManagement = document.getRootElement().getChild("dependencyManagement");
@@ -94,23 +109,42 @@ public class TargetPlatformPomProcessor implements PomProcessor {
       x_dependencies = new Element(x_dependencyManagement, "dependencies");
     }
 
-    Map<GA, Element> managed = new HashMap<>();
+    Map<GA, Element> x_managed = new HashMap<>();
     for (Element x_dependency : x_dependencies.getChildren("dependency")) {
       GA key = keyGA(getText(x_dependency, "groupId"), getText(x_dependency, "artifactId"));
-      managed.put(key, x_dependency);
+      x_managed.put(key, x_dependency);
     }
 
-    for (Map.Entry<GA, String> entry : injected.entrySet()) {
+    for (Map.Entry<GA, String> entry : versions.entrySet()) {
       GA key = entry.getKey();
       String version = entry.getValue();
 
-      Element x_dependency = managed.get(key);
+      Element x_dependency = x_managed.get(key);
       if (x_dependency == null) {
         x_dependency = new Element(x_dependencies, "dependency");
+        x_dependencies.addNode(new Text("\n"));
+
         new Element(x_dependency, "groupId").setText(key.groupId);
         new Element(x_dependency, "artifactId").setText(key.artifactId);
         new Element(x_dependency, "version").setText(version);
-        x_dependencies.addNode(new Text("\n"));
+
+        Dependency dependency = dependencies.get(key);
+        if (dependency != null) {
+          addChild(x_dependency, "type", dependency.getType());
+          addChild(x_dependency, "classifier", dependency.getClassifier());
+          addChild(x_dependency, "scope", dependency.getScope());
+          addChild(x_dependency, "optional", dependency.getOptional());
+
+          List<Exclusion> exclusions = dependency.getExclusions();
+          if (exclusions != null && !exclusions.isEmpty()) {
+            Element x_exclusions = new Element(x_dependency, "exclusions");
+            for (Exclusion exclusion : exclusions) {
+              Element x_exclusion = new Element(x_exclusions, "exclusion");
+              addChild(x_exclusion, "groupId", exclusion.getGroupId());
+              addChild(x_exclusion, "artifactId", exclusion.getArtifactId());
+            }
+          }
+        }
       } else {
         Element x_version = x_dependency.getChild("version");
         if (x_version == null) {
@@ -118,6 +152,13 @@ public class TargetPlatformPomProcessor implements PomProcessor {
         }
         x_version.setText(version);
       }
+    }
+  }
+
+  private void addChild(Element element, String name, String value) {
+    if (value != null) {
+      Element child = new Element(element, name);
+      child.setText(value);
     }
   }
 
