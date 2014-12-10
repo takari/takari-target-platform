@@ -70,6 +70,22 @@ public class IntegrationTest {
   }
 
   @Test
+  public void testMultimodule_versioned() throws Exception {
+    File basedir = resources.getBasedir("versioned-multimodule");
+
+    maven.forProject(basedir).execute("compile").assertErrorFreeLog();
+  }
+
+  @Test
+  public void testMultimodule_versioned_mismatch() throws Exception {
+    File basedir = resources.getBasedir("versioned-multimodule-mismatch");
+
+    MavenExecutionResult result = maven.forProject(basedir).execute("compile");
+
+    result.assertLogText("Version 1.0.0-SNAPSHOT does not match version constrant [2.0.0,3.0.0)");
+  }
+
+  @Test
   public void testTransitiveDependency() throws Exception {
     File basedir = resources.getBasedir("transitive-dependency");
 
@@ -194,23 +210,26 @@ public class IntegrationTest {
   }
 
   @Test
-  public void testEnforceVersionlessDependency() throws Exception {
-    File basedir = resources.getBasedir("enforce-versionless-dependency");
+  public void testVersioned() throws Exception {
+    File basedir = resources.getBasedir("versioned");
 
-    MavenExecutionResult result = maven.forProject(basedir) //
-        .execute("clean", "compile");
-
-    result.assertLogText("Dependency version is not allowed");
+    maven.forProject(basedir).execute("compile").assertErrorFreeLog();
   }
 
   @Test
-  public void testEnforceVersionlessDependencyManagement() throws Exception {
-    File basedir = resources.getBasedir("enforce-versionless-dependencyManagement");
+  public void testVersioned_dependencyManagement() throws Exception {
+    File basedir = resources.getBasedir("versioned-dependencyManagement");
 
-    MavenExecutionResult result = maven.forProject(basedir) //
-        .execute("clean", "compile");
+    maven.forProject(basedir).execute("compile").assertErrorFreeLog();
+  }
 
-    result.assertLogText("Dependency version is not allowed");
+  @Test
+  public void testVersioned_mismatch() throws Exception {
+    File basedir = resources.getBasedir("versioned-mismatch");
+
+    MavenExecutionResult result = maven.forProject(basedir).execute("compile");
+
+    result.assertLogText("Version 3.8.1 does not match version constrant 4.11");
   }
 
   @Test

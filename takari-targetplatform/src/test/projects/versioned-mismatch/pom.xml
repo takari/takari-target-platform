@@ -1,0 +1,21 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>versioned-mismatch</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <!--
+    | The point of this test is to make sure dependency <version> 
+    | specification is allowed for regular dependencies and the version
+    | is validated against available version. 
+   -->
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,16 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>multimodule-module-a</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.takari.maven.targetplatform.tests</groupId>
+      <artifactId>multimodule-versions-module-b</artifactId>
+      <version>[1.0.0,2.0.0)</version>
+    </dependency>
+  </dependencies>
+
+</project>

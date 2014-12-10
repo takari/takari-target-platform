@@ -1,0 +1,18 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>versioned-multimodule</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <!--
+    | The point of this test is to validate that project-project dependencies
+    | allow <version> elements. 
+   -->
+
+  <modules>
+    <module>module-a</module>
+    <module>module-b</module>
+  </modules>
+</project>

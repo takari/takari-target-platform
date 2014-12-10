@@ -1,0 +1,25 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>versioned-multimodule-mismatch</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <!--
+    | The point of this test is to validate that project-project dependencies
+    | <version> elements are validated to match target project version.
+    |
+    | This test build is expected to fail because module-a requires module-b
+    | version=[2.0.0,3.0.0), which does not exist.
+    |
+    | TODO validate the build still fails if a matching version exists in a 
+    | remote repository. Project-project dependencies are expected to resolve
+    | within the reactor.
+   -->
+
+  <modules>
+    <module>module-a</module>
+    <module>module-b</module>
+  </modules>
+</project>

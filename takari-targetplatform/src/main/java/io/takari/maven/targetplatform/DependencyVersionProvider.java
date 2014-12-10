@@ -5,9 +5,13 @@ import java.util.Collection;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Dependency;
+import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionConstraint;
 
 public class DependencyVersionProvider {
+
+  private static final GenericVersionScheme VERSIONING_SCHEME = new GenericVersionScheme();
 
   private final TakariTargetPlatform targetPlatform;
   private final boolean strict;
@@ -42,16 +46,39 @@ public class DependencyVersionProvider {
       // in non-strict mode, use provided dependency versions
       result = version;
     } else {
-      if (version != null) {
-        throw new InvalidVersionSpecificationException("Dependency version is not allowed");
-      }
       result = getReactorVersion(groupId, artifactId);
       if (result == null) {
         result = getTargetPlatformVersion(groupId, artifactId);
       }
+      validateVersion(version, result);
     }
 
     return result;
+  }
+
+  private void validateVersion(String constraintSpecification, String versionSpecification)
+      throws InvalidVersionSpecificationException {
+    if (constraintSpecification == null || versionSpecification == null) {
+      // version was not specified or could not be matched to the target platform
+      // in either case, there is nothing to validate
+      return;
+    }
+    try {
+      VersionConstraint constraint =
+          VERSIONING_SCHEME.parseVersionConstraint(constraintSpecification);
+      Version version = VERSIONING_SCHEME.parseVersion(versionSpecification);
+      if (!constraint.containsVersion(version)) {
+        String message =
+            String.format("Version %s does not match version constrant %s", versionSpecification,
+                constraintSpecification);
+        throw new InvalidVersionSpecificationException(message);
+      }
+    } catch (org.eclipse.aether.version.InvalidVersionSpecificationException e) {
+      InvalidVersionSpecificationException e2 =
+          new InvalidVersionSpecificationException(e.getMessage());
+      e2.initCause(e);
+      throw e2;
+    }
   }
 
   private String getTargetPlatformVersion(final String groupId, final String artifactId)

@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.maven.targetplatform.tests</groupId>
-  <artifactId>enforce-versionless-dependency</artifactId>
+  <artifactId>versioned</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
   <!--
     | The point of this test is to make sure dependency <version> 
-    | specification is not allowed for regular dependencies 
+    | specification is allowed for regular dependencies 
    -->
 
   <dependencies>
