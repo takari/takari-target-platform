@@ -1,0 +1,60 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.lifecycle.its.targetplatform</groupId>
+  <artifactId>nonstrict</artifactId>
+  <version>0.1</version>
+  <packaging>takari-jar</packaging>
+
+  <!--
+    | The point of this test is to verify that non-strict projects still get
+    | their pom.xml expanded and <dependencyManagement> section injected.  
+   -->
+
+  <properties>
+    <takari.targetplatform.strict>false</takari.targetplatform.strict>
+  </properties>
+
+  <distributionManagement>
+    <repository>
+      <id>repoid</id>
+      <url>file://${repopath}</url>
+    </repository>
+    <snapshotRepository>
+      <id>repoid</id>
+      <url>file://${repopath}</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.2</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.takari.maven.plugins</groupId>
+        <artifactId>takari-lifecycle-plugin</artifactId>
+        <version>1.8.5</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>io.takari.maven</groupId>
+        <artifactId>takari-targetplatform-plugin</artifactId>
+        <version>${it-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process-pom</goal>
+            </goals>
+            <phase>prepare-package</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

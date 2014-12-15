@@ -11,6 +11,7 @@ import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
 import java.io.File;
 import java.io.IOException;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,6 +61,60 @@ public class TargetPlatformTest {
     File remoteGroup = new File(remoterepo, "io/takari/lifecycle/its/targetplatform");
     File remotePom = new File(remoteGroup, "basic/0.1/basic-0.1.pom");
     assertManagedDependency(remotePom, "junit:junit:3.8.1");
+  }
+
+  @Test
+  public void testNonstrict() throws Exception {
+    File basedir = resources.getBasedir("nonstrict");
+
+    File remoterepo = new File(basedir, "remoterepo");
+    Assert.assertTrue(remoterepo.mkdirs());
+
+    File localrepo = properties.getLocalRepository();
+
+    MavenExecutionResult result = verifier.forProject(basedir) //
+        .withCliOption("-Drepopath=" + remoterepo.getCanonicalPath()) //
+        .execute("deploy");
+
+    result.assertErrorFreeLog();
+
+    File localGroup = new File(localrepo, "io/takari/lifecycle/its/targetplatform");
+    File installedPom = new File(localGroup, "nonstrict/0.1/nonstrict-0.1.pom");
+    assertManagedDependency(installedPom, "junit:junit:3.8.2");
+
+    File remoteGroup = new File(remoterepo, "io/takari/lifecycle/its/targetplatform");
+    File remotePom = new File(remoteGroup, "nonstrict/0.1/nonstrict-0.1.pom");
+    assertManagedDependency(remotePom, "junit:junit:3.8.2");
+  }
+
+  @Test
+  public void testLegacy() throws Exception {
+    File basedir = resources.getBasedir("legacy");
+
+    File remoterepo = new File(basedir, "remoterepo");
+    Assert.assertTrue(remoterepo.mkdirs());
+
+    File localrepo = properties.getLocalRepository();
+
+    MavenExecutionResult result = verifier.forProject(basedir) //
+        .withCliOption("-Drepopath=" + remoterepo.getCanonicalPath()) //
+        .execute("deploy");
+
+    result.assertErrorFreeLog();
+
+    File localGroup = new File(localrepo, "io/takari/lifecycle/its/targetplatform");
+    File installedPom = new File(localGroup, "legacy/0.1/legacy-0.1.pom");
+    assertFileContents(new File(basedir, "pom.xml"), installedPom);
+
+    File remoteGroup = new File(remoterepo, "io/takari/lifecycle/its/targetplatform");
+    File remotePom = new File(remoteGroup, "legacy/0.1/legacy-0.1.pom");
+    assertFileContents(new File(basedir, "pom.xml"), remotePom);
+  }
+
+  private void assertFileContents(File expected, File actual) throws IOException {
+    String expectedContents = FileUtils.fileRead(expected);
+    String actualContents = FileUtils.fileRead(actual);
+    Assert.assertEquals(expectedContents, actualContents);
   }
 
   private void assertManagedDependency(File pom, String expected) throws IOException {

@@ -1,5 +1,6 @@
 package io.takari.maven.targetplatform.plugins;
 
+import io.takari.maven.targetplatform.TakariTargetPlatform;
 import io.takari.maven.targetplatform.TargetPlatformProvider;
 
 import java.util.HashMap;
@@ -58,19 +59,19 @@ public class TargetPlatformPomProcessor implements PomProcessor {
 
   private final MavenProject project;
 
-  // private final TakariTargetPlatform targetPlatform;
+  private final TakariTargetPlatform targetPlatform;
 
   @Inject
   public TargetPlatformPomProcessor(MavenProject project, TargetPlatformProvider targetPlatform) {
     this.project = project;
-    // this.targetPlatform = targetPlatform.getTargetPlatform(project);
+    this.targetPlatform = targetPlatform.getTargetPlatform(project);
   }
 
   @Override
   public void process(Document document) {
-    // if (targetPlatform == null) {
-    // return;
-    // }
+    if (targetPlatform == null) {
+      return;
+    }
 
     project.setArtifactFilter(new ArtifactFilter() {
       @Override
