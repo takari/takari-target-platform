@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.takari</groupId>
     <artifactId>takari</artifactId>
-    <version>14</version>
+    <version>15</version>
   </parent>
 
   <groupId>io.takari.maven</groupId>
@@ -15,6 +15,7 @@
 
   <properties>
     <apache-maven.version>3.2.4-SNAPSHOT</apache-maven.version>
+    <eclipse-aether.version>1.0.2-SNAPSHOT</eclipse-aether.version>
     <takari-lifecycle.version>1.8.5</takari-lifecycle.version>
     <guava.version>18.0</guava.version>
 
@@ -28,32 +29,8 @@
   </modules>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>io.takari.maven.plugins</groupId>
-        <artifactId>takari-lifecycle-plugin</artifactId>
-        <version>${takari-lifecycle.version}</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>sisu-maven-plugin</artifactId>
-          <version>1.1</version>
-          <executions>
-            <execution>
-              <id>generate-index</id>
-              <goals>
-                <goal>main-index</goal>
-                <goal>test-index</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
         <plugin>
           <groupId>io.takari.maven.plugins</groupId>
           <artifactId>takari-plugin-testing-plugin</artifactId>
