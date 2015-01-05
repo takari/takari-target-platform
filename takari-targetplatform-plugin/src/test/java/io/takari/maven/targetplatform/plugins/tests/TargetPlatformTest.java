@@ -22,7 +22,7 @@ import de.pdark.decentxml.Element;
 import de.pdark.decentxml.XMLParser;
 
 @RunWith(MavenJUnitTestRunner.class)
-@MavenVersions({"3.2.4-SNAPSHOT"})
+@MavenVersions({"3.2.5", "3.2.6-SNAPSHOT"})
 public class TargetPlatformTest {
 
   public final MavenRuntime verifier;

@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
 @RunWith(MavenJUnitTestRunner.class)
-@MavenVersions({"3.2.4-SNAPSHOT"})
+@MavenVersions({"3.2.5", "3.2.6-SNAPSHOT"})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTest {
 
