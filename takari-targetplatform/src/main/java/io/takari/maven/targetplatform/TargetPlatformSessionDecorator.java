@@ -9,7 +9,6 @@ import org.apache.maven.project.RepositorySessionDecorator;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.eclipse.aether.util.graph.traverser.AndDependencyTraverser;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
 
 @Named
@@ -47,9 +46,6 @@ public class TargetPlatformSessionDecorator implements RepositorySessionDecorato
     if (strict) {
       filtered.setVersionFilter(ChainedVersionFilter.newInstance(filtered.getVersionFilter(),
           new TargetPlatformVersionFilter(reactorProjects, targetPlatform)));
-      filtered.setDependencyTraverser(AndDependencyTraverser.newInstance(filtered
-          .getDependencyTraverser(), new TargetPlatformDependencyTraverser(reactorProjects,
-          targetPlatform)));
 
       DependencyVersionProvider versionProvider =
           new DependencyVersionProvider(targetPlatform, reactorProjects, strict);
