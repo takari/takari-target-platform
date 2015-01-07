@@ -242,4 +242,15 @@ public class IntegrationTest {
     result.assertErrorFreeLog();
   }
 
+  @Test
+  public void testVersionRangeAmbiguous() throws Exception {
+    File basedir = resources.getBasedir("version-range-ambiguous");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("compile");
+
+    result.assertErrorFreeLog();
+    result.assertLogText("junit:junit:jar:3.8.1:compile");
+    result.assertNoLogText("junit:junit:jar:4");
+  }
 }

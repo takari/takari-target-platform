@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<target-platform>
+  <gav g="io.takari.maven.targetplatform.tests" a="version-range-dependency-m1" v="0.1">
+    <artifact e="jar" sha1="7b5d38edc519994ab9f3688ca7ff1ac00ae7a71d" />
+    <artifact e="pom" sha1="eba20f7628666d63d07528751e63db903bbe8fc8" />
+  </gav>
+  <gav g="junit" a="junit" v="2.0">
+    <artifact e="jar" sha1="jar" />
+    <artifact e="pom" sha1="pom" />
+  </gav>
+  <gav g="junit" a="junit" v="3.8.1">
+    <artifact e="pom" sha1="16d74791c801c89b0071b1680ea0bc85c93417bb" />
+    <artifact e="jar" sha1="99129f16442844f6a4a11ae22fbbee40b14d774f" />
+  </gav>
+</target-platform>

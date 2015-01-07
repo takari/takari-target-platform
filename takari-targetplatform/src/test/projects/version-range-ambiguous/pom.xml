@@ -1,0 +1,51 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>version-range-ambiguous</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <!--
+    | The point of this test is to validate that only versions present in the target platform
+    | are considered during version range evaluation.
+    |
+    | version-range-dependency-m1 depends on junit [3.8,), while the target platform includes
+    | (fictitious) junit 2.0 and 3.8.1. Without VersionFilter, Aether would consider all
+    | available junit versions and select 4.11 (or newer), which is not part of the target
+    | platform.
+   -->
+
+  <repositories>
+    <repository>
+      <id>repo</id>
+      <url>file://${project.basedir}/repo</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.takari.maven.targetplatform.tests</groupId>
+      <artifactId>version-range-dependency-m1</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>list</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>list</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
