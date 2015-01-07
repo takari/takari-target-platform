@@ -94,6 +94,7 @@ public class IntegrationTest {
     result.assertErrorFreeLog();
     result.assertLogText("junit:junit:jar:4.11:compile");
     result.assertLogText("org.hamcrest:hamcrest-core:jar:1.2.1:compile");
+    result.assertNoLogText("org.hamcrest:hamcrest-core:jar:1.3");
   }
 
   @Test
