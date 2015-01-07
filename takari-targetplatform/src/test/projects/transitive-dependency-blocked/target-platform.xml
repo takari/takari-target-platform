@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<target-platform>
+  <gav g="io.takari.maven.targetplatform.tests" a="transitive-dependency-blocked-m1" v="0.1">
+    <artifact e="jar" sha1="b08ecb6b5d1ec535b024e5cf36b1144dd4e6235c" />
+    <artifact e="pom" sha1="bea657890db8205daa11fcfbf38392cae5da1e7f" />
+  </gav>
+</target-platform>

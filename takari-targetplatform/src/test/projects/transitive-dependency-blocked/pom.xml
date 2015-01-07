@@ -1,0 +1,33 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.takari.maven.targetplatform.tests</groupId>
+  <artifactId>transitive-dependency-blocked</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <!--
+    | Assert dependencies of blocked dependencies are not traversed and their pom.xml files
+    | are not downloaded.
+    |
+    |     transitive-dependency-m1
+    |      \- junit:4.11 (blocked)
+    |          \- org.hamcrest:1.3
+    |
+    | org.hamcrest:1.3 must not be traversed
+   -->
+
+  <repositories>
+    <repository>
+      <id>repo</id>
+      <url>file://${project.basedir}/repo</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.takari.maven.targetplatform.tests</groupId>
+      <artifactId>transitive-dependency-blocked-m1</artifactId>
+    </dependency>
+  </dependencies>
+
+</project>

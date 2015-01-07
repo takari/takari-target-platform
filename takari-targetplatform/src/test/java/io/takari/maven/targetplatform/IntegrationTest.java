@@ -254,4 +254,26 @@ public class IntegrationTest {
     result.assertLogText("junit:junit:jar:3.8.1:compile");
     result.assertNoLogText("junit:junit:jar:4");
   }
+
+  @Test
+  public void testDependencyBlocked() throws Exception {
+    File basedir = resources.getBasedir("dependency-blocked");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .withCliOption("-X").execute("compile");
+
+    result.assertLogText("Invalid version: 4.11 found for: Dependency: junit:junit");
+    result.assertNoLogText("org.hamcrest:hamcrest-core:jar:1.3");
+  }
+
+  @Test
+  public void testTransitiveDependencyBlocked() throws Exception {
+    File basedir = resources.getBasedir("transitive-dependency-blocked");
+
+    MavenExecutionResult result = maven.forProject(basedir) //
+        .execute("compile");
+
+    result.assertLogText("<blocked> junit:junit:jar:4.11");
+    result.assertNoLogText("org.hamcrest:hamcrest-core:jar:1.3");
+  }
 }
