@@ -16,7 +16,7 @@
   <properties>
     <apache-maven.version>3.2.5</apache-maven.version>
     <eclipse-aether.version>1.0.0.v20140518</eclipse-aether.version>
-    <takari-lifecycle.version>1.8.5</takari-lifecycle.version>
+    <plugin-testing.version>2.0.0</plugin-testing.version>
     <guava.version>18.0</guava.version>
 
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
@@ -34,7 +34,7 @@
         <plugin>
           <groupId>io.takari.maven.plugins</groupId>
           <artifactId>takari-lifecycle-plugin</artifactId>
-          <version>1.10.0-SNAPSHOT</version>
+          <version>1.10.0</version>
         </plugin>
 
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->

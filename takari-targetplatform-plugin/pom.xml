@@ -11,7 +11,7 @@
 
   <properties>
     <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
-    <incrementalbuild.version>0.9.1</incrementalbuild.version>
+    <incrementalbuild.version>0.10.0</incrementalbuild.version>
   </properties>
 
   <dependencies>
@@ -81,13 +81,13 @@
     <dependency>
       <groupId>io.takari.maven.plugins</groupId>
       <artifactId>takari-plugin-testing</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>${plugin-testing.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.takari.maven.plugins</groupId>
       <artifactId>takari-plugin-integration-testing</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>${plugin-testing.version}</version>
       <type>pom</type>
       <scope>test</scope>
     </dependency>
@@ -95,12 +95,6 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>3.0.20</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.plugin-testing</groupId>
-      <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>3.2.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
