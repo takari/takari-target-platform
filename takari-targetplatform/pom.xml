@@ -115,12 +115,6 @@
 
   <build>
     <plugins>
-
-      <plugin>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
-      </plugin>
-
       <plugin>
         <groupId>io.takari.maven.plugins</groupId>
         <artifactId>takari-lifecycle-plugin</artifactId>
@@ -130,6 +124,13 @@
             <phase>process-test-resources</phase>
             <goals>
               <goal>testProperties</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>sisu-index</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>sisu-index</goal>
             </goals>
           </execution>
         </executions>
