@@ -2,9 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.takari.lifecycle.its.targetplatform</groupId>
-  <artifactId>basic</artifactId>
+  <artifactId>legacy</artifactId>
   <version>0.1</version>
   <packaging>takari-jar</packaging>
+
+  <!--
+    | Smoke-test to make sure we don't do anything silly for "legacy" projects,
+    | i.e. projects without target platform. 
+   -->
 
   <distributionManagement>
     <repository>
@@ -21,6 +26,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>3.8.2</version>
     </dependency>
   </dependencies>
 
@@ -34,7 +40,7 @@
       </plugin>
       <plugin>
         <groupId>io.takari.maven</groupId>
-        <artifactId>takari-targetplatform-plugin</artifactId>
+        <artifactId>takari-target-platform-plugin</artifactId>
         <version>${it-plugin.version}</version>
         <executions>
           <execution>
@@ -47,4 +53,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

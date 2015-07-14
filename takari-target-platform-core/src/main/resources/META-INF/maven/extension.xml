@@ -19,6 +19,6 @@
   </exportedPackages>
 
   <exportedArtifacts>
-    <exportedArtifact>io.takari.maven:takari-targetplatform</exportedArtifact>
+    <exportedArtifact>io.takari.maven:takari-target-platform-core</exportedArtifact>
   </exportedArtifacts>
 </extension>

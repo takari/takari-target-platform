@@ -44,7 +44,7 @@
       </plugin>
       <plugin>
         <groupId>io.takari.maven</groupId>
-        <artifactId>takari-targetplatform-plugin</artifactId>
+        <artifactId>takari-target-platform-plugin</artifactId>
         <version>${it-plugin.version}</version>
         <executions>
           <execution>
