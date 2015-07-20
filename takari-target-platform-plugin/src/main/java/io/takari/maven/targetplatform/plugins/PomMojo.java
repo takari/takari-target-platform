@@ -7,10 +7,6 @@
  */
 package io.takari.maven.targetplatform.plugins;
 
-import io.takari.incrementalbuild.BuildContext;
-import io.takari.incrementalbuild.Incremental;
-import io.takari.incrementalbuild.Incremental.Configuration;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -27,6 +23,9 @@ import org.apache.maven.project.MavenProject;
 import de.pdark.decentxml.Document;
 import de.pdark.decentxml.XMLParser;
 import de.pdark.decentxml.XMLWriter;
+import io.takari.incrementalbuild.BasicBuildContext;
+import io.takari.incrementalbuild.Incremental;
+import io.takari.incrementalbuild.Incremental.Configuration;
 
 @Mojo(name = "process-pom", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
 public class PomMojo extends AbstractMojo {
@@ -45,7 +44,7 @@ public class PomMojo extends AbstractMojo {
   private List<PomProcessor> processors;
 
   @Component
-  private BuildContext buildContext;
+  private BasicBuildContext buildContext;
 
   @Override
   public void execute() throws MojoExecutionException {
