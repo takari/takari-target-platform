@@ -18,7 +18,7 @@
   </parent>
 
   <artifactId>takari-target-platform-core</artifactId>
-  <packaging>takari-jar</packaging>
+  <packaging>takari-maven-component</packaging>
 
   <dependencies>
     <dependency>
@@ -125,27 +125,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>io.takari.maven.plugins</groupId>
-        <artifactId>takari-lifecycle-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>test-properties</id>
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>testProperties</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>sisu-index</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>sisu-index</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <version>1.8.1</version>
@@ -207,7 +186,7 @@
                 </Export-Package>
 
                 <Require-Bundle>
-                  org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,1.7.0)",
+                  org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,1.8.0)",
                   com.google.guava;bundle-version="15.0.0",
                   org.slf4j.api;bundle-version="1.7.2"
                 </Require-Bundle>
@@ -219,7 +198,7 @@
 
         <configuration>
           <supportedProjectTypes>
-            <type>takari-jar</type>
+            <type>takari-maven-component</type>
           </supportedProjectTypes>
         </configuration>
       </plugin>
